@@ -18,14 +18,15 @@ struct OnboardingWelcomeStep: View {
   
   var body: some View {
     VStack(alignment: .leading, spacing: 32) {
-      VStack(alignment: .leading, spacing: 8) {
+      VStack(alignment: .leading, spacing: 12) {
         Text("Welcome to Critique")
           .font(.system(size: 32, weight: .bold))
+          .frame(maxWidth: .infinity, alignment: .leading)
         
         Text("Let's get you set up.")
           .font(.title3)
           .foregroundStyle(.secondary)
-          .padding(.top, 4)
+          .frame(maxWidth: .infinity, alignment: .leading)
       }
       .padding(.top, 20)
       .padding(.horizontal, 24)
@@ -36,6 +37,7 @@ struct OnboardingWelcomeStep: View {
           .font(.headline)
           .foregroundStyle(.primary)
           .padding(.top, 20)
+          .frame(maxWidth: .infinity, alignment: .leading)
 
         PermissionRow(
           icon: "hand.raised.square.on.square",

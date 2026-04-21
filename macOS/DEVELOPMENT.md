@@ -28,16 +28,35 @@ README's Linked Content/To Compile the Application Yourself.md
 
 ---
 
+## Distributing (Free Method)
+
+If you don't have a paid Apple Developer account, you can still distribute Critique using the provided `package.sh` script.
+
+### 1. Create the Release Package
+Run the following command in the `macOS` directory:
+
+```bash
+chmod +x package.sh
+./package.sh
+```
+
+This will create a **Critique.dmg** on your desktop.
+
+### 2. Guide for your Users
+Since the app isn't notarized, users will see a security warning. You should provide these instructions on your website or GitHub release page:
+
+> **How to Open Critique:**
+> 1. Download and open the `.dmg`.
+> 2. Drag **Critique** into your Applications folder.
+> 3. **Right-click** Critique in your Applications folder and select **Open**.
+> 4. Click **Open** again on the security prompt. (You only need to do this once!)
+
+---
+
 ## Troubleshooting
 
-### Hotkey not firing?
-- Ensure the shortcut doesn't clash with system defaults (Spotlight, Input Sources).
-- Try setting a unique combo like Ctrl + J or Opt + Space.
-
-### Text replacement not working?
-- Verify **Accessibility** permissions under System Settings -> Privacy & Security.
-- Some apps require **Screen Recording** permissions to allow text capture.
-
-### Local model issues?
-- **MLX**: Ensure the model is downloaded and selected in Settings.
-- **Ollama**: Verify the server is running (ollama serve) and the model name matches exactly.
+### `xcodebuild` error in terminal?
+If you see an error about `CommandLineTools`, run this to point your terminal to the full version of Xcode:
+```bash
+sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
+```

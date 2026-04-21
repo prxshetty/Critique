@@ -200,8 +200,15 @@
             background: rgba(0, 0, 0, 0.05);
         }
 
-        [data-theme="dark"] .btn-secondary:hover {
+        .btn-secondary:hover {
             background: rgba(255, 255, 255, 0.05);
+        }
+
+        .btn-disabled {
+            opacity: 0.4;
+            filter: grayscale(1);
+            cursor: not-allowed;
+            pointer-events: none;
         }
 
         .icon-only {
@@ -422,7 +429,7 @@
                     <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
                 </svg>
             </button>
-            <a href="https://github.com/prxshetty/Critique" class="btn btn-secondary">
+            <a href="https://github.com/prxshetty/Critique/releases" class="btn btn-secondary">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path
@@ -431,7 +438,7 @@
                 </svg>
                 <span>GitHub</span>
             </a>
-            <a href="https://github.com/prxshetty/Critique/releases" class="btn btn-primary">
+            <a href="https://github.com/prxshetty/Critique/releases/latest/download/Critique.dmg" class="btn btn-primary" id="downloadBtn">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
@@ -481,6 +488,17 @@
             el.style.transition = 'all 0.6s cubic-bezier(0.22, 1, 0.36, 1)';
             observer.observe(el);
         });
+
+        // Platform detection for Download button
+        const downloadBtn = document.getElementById('downloadBtn');
+        const isWindows = navigator.userAgent.toLowerCase().includes('win');
+        
+        if (isWindows && downloadBtn) {
+            downloadBtn.classList.add('btn-disabled');
+            const span = downloadBtn.querySelector('span');
+            if (span) span.textContent = 'macOS Only';
+            downloadBtn.setAttribute('title', 'Critique is currently only available for macOS');
+        }
     </script>
 </body>
 

@@ -106,12 +106,14 @@ class WindowManager: NSObject, NSWindowDelegate {
 
         let newSettingsWindow = NSWindow(
             contentRect: NSRect(x: 0, y: 0, width: 560, height: 520),
-            styleMask: [.titled, .closable, .resizable],
+            styleMask: [.titled, .closable, .resizable, .fullSizeContentView],
             backing: .buffered,
             defer: false
         )
 
         newSettingsWindow.title = "Complete Setup"
+        newSettingsWindow.titlebarAppearsTransparent = true
+        newSettingsWindow.titleVisibility = .hidden
         newSettingsWindow.identifier = NSUserInterfaceItemIdentifier("SettingsWindow")
         newSettingsWindow.isReleasedWhenClosed = false
         newSettingsWindow.minSize = NSSize(width: 520, height: 440)
@@ -142,12 +144,14 @@ class WindowManager: NSObject, NSWindowDelegate {
 
         let newSettingsWindow = NSWindow(
             contentRect: NSRect(x: 0, y: 0, width: 620, height: 600),
-            styleMask: [.titled, .closable, .miniaturizable, .resizable],
+            styleMask: [.titled, .closable, .miniaturizable, .resizable, .fullSizeContentView],
             backing: .buffered,
             defer: false
         )
 
         newSettingsWindow.title = "Settings"
+        newSettingsWindow.titlebarAppearsTransparent = true
+        newSettingsWindow.titleVisibility = .hidden
         newSettingsWindow.identifier = NSUserInterfaceItemIdentifier("SettingsWindow")
         newSettingsWindow.isReleasedWhenClosed = false
         newSettingsWindow.minSize = NSSize(width: 520, height: 470)
@@ -171,6 +175,9 @@ class WindowManager: NSObject, NSWindowDelegate {
         window.level = .normal
         window.identifier = NSUserInterfaceItemIdentifier("OnboardingWindow")
         
+        window.titlebarAppearsTransparent = true
+        window.titleVisibility = .hidden
+        
         window.center()
     }
 
@@ -181,6 +188,8 @@ class WindowManager: NSObject, NSWindowDelegate {
         settingsWindow = window
         window.delegate = self
         window.identifier = NSUserInterfaceItemIdentifier("SettingsWindow")
+        window.titlebarAppearsTransparent = true
+        window.titleVisibility = .hidden
     }
 
     func closeSettingsWindow() {
@@ -193,11 +202,13 @@ class WindowManager: NSObject, NSWindowDelegate {
     func showOnboarding(appState: AppState, title: String = "Welcome to Critique") {
         let window = NSWindow(
             contentRect: NSRect(x: 0, y: 0, width: 640, height: 720),
-            styleMask: [.titled, .closable, .miniaturizable, .resizable],
+            styleMask: [.titled, .closable, .miniaturizable, .resizable, .fullSizeContentView],
             backing: .buffered,
             defer: false
         )
         window.title = title
+        window.titlebarAppearsTransparent = true
+        window.titleVisibility = .hidden
         window.isReleasedWhenClosed = false
         window.minSize = NSSize(width: 560, height: 600)
 

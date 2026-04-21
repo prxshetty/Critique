@@ -1826,6 +1826,7 @@
       }
     },
     "Configure Anthropic (Claude)" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1848,6 +1849,7 @@
       }
     },
     "Configure Google Gemini AI" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1870,6 +1872,7 @@
       }
     },
     "Configure Mistral AI" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1892,6 +1895,7 @@
       }
     },
     "Configure Ollama (Self-Hosted)" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1914,6 +1918,7 @@
       }
     },
     "Configure OpenAI (ChatGPT)" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1936,6 +1941,7 @@
       }
     },
     "Configure OpenRouter" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2305,9 +2311,6 @@
         }
       }
     },
-    "Critique briefly copies your selection, sends it to your chosen AI provider (or a local model), and then pastes the result back results seamlessly." : {
-
-    },
     "Critique briefly copies your selection, sends it to your chosen AI provider (or a local model), and then pastes the result back—preserving formatting when supported." : {
       "extractionState" : "stale",
       "localizations" : {
@@ -2358,6 +2361,9 @@
       }
     },
     "Critique is up to date" : {
+
+    },
+    "Critique works by briefly copying your selection, enhancing it via AI, and pasting the results back seamlessly into your original app." : {
 
     },
     "Custom" : {
@@ -4387,9 +4393,6 @@
     "Headers" : {
 
     },
-    "Hey there 👋" : {
-
-    },
     "Hide %@" : {
       "localizations" : {
         "de" : {
@@ -4413,6 +4416,7 @@
       }
     },
     "How it works" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -4712,6 +4716,9 @@
           }
         }
       }
+    },
+    "Key Features" : {
+
     },
     "Key Points" : {
       "comment" : "ID for key points extraction",
@@ -5474,9 +5481,6 @@
           }
         }
       }
-    },
-    "More polite" : {
-
     },
     "Most changes apply automatically. Click Done to apply API key updates." : {
       "localizations" : {
@@ -6490,9 +6494,6 @@
           }
         }
       }
-    },
-    "Polite" : {
-
     },
     "Preserve core message/meaning" : {
       "extractionState" : "stale",
