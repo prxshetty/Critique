@@ -42,7 +42,7 @@ import ApplicationServices
 
           // Right Column (Visual Sandbox / Preview)
           ZStack {
-            Color(NSColor.controlBackgroundColor)
+            Color(NSColor.windowBackgroundColor).opacity(0.6)
               .ignoresSafeArea()
               
             // Live Sandbox for the Popup
@@ -52,8 +52,8 @@ import ApplicationServices
                   viewModel: PopupViewModel(),
                   closeAction: {}
                 )
-                .frame(width: 380, height: 380)
-                .disabled(true)
+                .frame(width: 380, height: 180)
+                .allowsHitTesting(false)
                 .shadow(color: .black.opacity(0.1), radius: 10, y: 5)
                 .scaleEffect(0.85)
             }

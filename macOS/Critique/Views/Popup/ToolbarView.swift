@@ -36,22 +36,43 @@ struct ToolbarView: View {
         return other
     }
 
+    // MARK: - Gradient Theme Helpers
+    private var isGradient: Bool { settings.themeStyle == .gradient }
+    
+    private var primaryColor: Color {
+        isGradient ? .white : .primary
+    }
+    
+    private var secondaryColor: Color {
+        isGradient ? .white.opacity(0.8) : .secondary
+    }
+    
+    private var backgroundStyle: AnyShapeStyle {
+        isGradient ? AnyShapeStyle(Color.white.opacity(0.18)) : AnyShapeStyle(.quaternary)
+    }
+
     var body: some View {
         HStack(spacing: 0) {
             // ── Text input ──────────────────────────────────────────────
-            TextField(
-                "",
-                text: $customText,
-                prompt: Text("Ask Critique...")
-                    .foregroundStyle(.secondary)
-            )
-            .textFieldStyle(.plain)
-            .font(.system(size: 13, weight: .regular))
-            .foregroundStyle(.primary)
+            ZStack(alignment: .leading) {
+                if customText.isEmpty {
+                    Text("Ask Critique...")
+                        .foregroundStyle(secondaryColor)
+                        .padding(.leading, 14)
+                }
+                
+                TextField(
+                    "",
+                    text: $customText
+                )
+                .textFieldStyle(.plain)
+                .font(.system(size: 13, weight: .regular))
+                .foregroundStyle(primaryColor)
+                .padding(.leading, 14)
+                .padding(.trailing, 8)
+                .onSubmit { runCustomAction() }
+            }
             .frame(minWidth: 100)
-            .padding(.leading, 14)
-            .padding(.trailing, 8)
-            .onSubmit { runCustomAction() }
 
             // ── Tone picker ─────────────────────────────────────────────
             Menu {
@@ -71,10 +92,11 @@ struct ToolbarView: View {
                 if settings.commandDisplayStyle == .iconOnly {
                     ZStack {
                         Circle()
-                            .fill(.quaternary)
+                            .fill(backgroundStyle)
                         
                         Image(systemName: selectedCommand?.icon ?? "sparkles")
                             .font(DesignSystem.iconFont)
+                            .foregroundStyle(primaryColor)
                     }
                     .frame(width: DesignSystem.buttonSize, height: DesignSystem.buttonSize)
                 } else {
@@ -83,19 +105,21 @@ struct ToolbarView: View {
                         if hasIcon {
                             Image(systemName: selectedCommand?.icon ?? "sparkles")
                                 .font(DesignSystem.iconFont)
+                                .foregroundStyle(primaryColor)
                         }
                         Text(selectedCommand?.name ?? "Tone")
                             .font(DesignSystem.iconFont)
+                            .foregroundStyle(primaryColor)
                             
                         Image(systemName: "chevron.down")
                             .font(DesignSystem.chevronFont)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(secondaryColor)
                     }
                     .padding(.horizontal, 10)
                     .padding(.vertical, 5)
                     .background(
                         Capsule()
-                            .fill(.quaternary)
+                            .fill(backgroundStyle)
                     )
                 }
             }
@@ -119,12 +143,12 @@ struct ToolbarView: View {
                     } else {
                         ZStack {
                             Circle()
-                                .fill(.quaternary)
+                                .fill(backgroundStyle)
                                 .opacity((selectedCommand != nil && !isProcessing) ? 1.0 : 0.4)
                             
                             Image(systemName: "arrow.up")
                                 .font(DesignSystem.buttonIconFont)
-                                .foregroundStyle(.primary)
+                                .foregroundStyle(primaryColor)
                         }
                     }
                 }

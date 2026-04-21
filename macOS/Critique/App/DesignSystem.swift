@@ -36,28 +36,28 @@ struct DesignSystem {
                 shadowRadius: 10,
                 shadowYOffset: 4,
                 shadowColor: { scheme in Color.black.opacity(scheme == .light ? 0.1 : 0.3) },
-                borderColor: { scheme in Color.white.opacity(scheme == .light ? 0.3 : 0.1) }
+                borderColor: { scheme in scheme == .light ? Color.black.opacity(0.08) : Color.white.opacity(0.1) }
             )
         case .glass:
             return ThemeTokens(
                 shadowRadius: 40,
                 shadowYOffset: 8,
                 shadowColor: { scheme in Color.black.opacity(scheme == .light ? 0.15 : 0.4) },
-                borderColor: { scheme in Color.white.opacity(scheme == .light ? 0.3 : 0.15) }
+                borderColor: { scheme in scheme == .light ? Color.black.opacity(0.1) : Color.white.opacity(0.15) }
             )
         case .gradient:
             return ThemeTokens(
                 shadowRadius: 32,
                 shadowYOffset: 8,
-                shadowColor: { scheme in Color.black.opacity(scheme == .light ? 0.2 : 0.4) },
-                borderColor: { scheme in Color.white.opacity(scheme == .light ? 0.3 : 0.15) }
+                shadowColor: { scheme in Color.black.opacity(scheme == .light ? 0.15 : 0.3) },
+                borderColor: { _ in Color.white.opacity(0.08) }
             )
         case .oled:
             return ThemeTokens(
                 shadowRadius: 0,
                 shadowYOffset: 0,
                 shadowColor: { _ in Color.clear },
-                borderColor: { _ in Color.white.opacity(0.2) }
+                borderColor: { scheme in scheme == .light ? Color.black.opacity(0.12) : Color.white.opacity(0.2) }
             )
         }
     }

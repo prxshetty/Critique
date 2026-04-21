@@ -44,13 +44,17 @@ struct WindowBackground: ViewModifier {
                 Group {
                     switch currentTheme {
                     case .standard:
-                        Rectangle().fill(.regularMaterial)
+                        if colorScheme == .light {
+                            Rectangle().fill(Color(NSColor.windowBackgroundColor).opacity(0.95))
+                        } else {
+                            Rectangle().fill(.regularMaterial)
+                        }
                     case .gradient:
                         MeshLikeGradientBackground()
                     case .glass:
                         GlassmorphicBackground()
                     case .oled:
-                        Color.black
+                        colorScheme == .dark ? Color.black : Color.white
                     }
                 }
                 .clipShape(shape)
@@ -72,7 +76,7 @@ struct MeshLikeGradientBackground: View {
     var body: some View {
         LinearGradient(
             colors: colorScheme == .light
-                ? [Color(hex: "d4bfff"), Color(hex: "f5e6f8")]
+                ? [Color(hex: "7c5cbf"), Color(hex: "b05090")]
                 : [Color(hex: "452E6B"), Color(hex: "703F3F")],
             startPoint: .topLeading,
             endPoint: .bottomTrailing
