@@ -1,0 +1,18 @@
+# macOS system files
+
+.DS_Store
+Windows_and_Linux/config.json
+
+.idea
+**/__pycache__
+**/*.mo
+**/pot_files
+
+# Agent metadata
+.agents/
+.agent
+.antigravity/
+
+# Xcode user-specific data
+**/xcuserdata/
+**/project.xcworkspace/xcuserdata/

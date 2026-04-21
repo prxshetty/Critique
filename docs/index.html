@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Critique | Privacy-first Native AI Writing Superpower</title>
+    <meta name="description"
+        content="Critique is a minimal, system-wide AI writing assistant for macOS. Privacy-focused, support for MLX models, and native performance.">
+    <link href="Satoshi_Complete%202/Fonts/WEB/css/satoshi.css" rel="stylesheet">
+    <style>
+        :root {
+            /* Light Theme */
+            --bg: #ffffff;
+            --fg: #1d1d1f;
+            --accent: #0071e3;
+            --muted: #86868b;
+            --card-bg: rgba(245, 245, 247, 0.7);
+            --border: rgba(0, 0, 0, 0.1);
+            --glass: rgba(255, 255, 255, 0.7);
+        }
+
+        [data-theme="dark"] {
+            /* Dark Theme */
+            --bg: #000000;
+            --fg: #f5f5f7;
+            --accent: #2997ff;
+            --muted: #a1a1a6;
+            --card-bg: rgba(28, 28, 30, 0.7);
+            --border: rgba(255, 255, 255, 0.1);
+            --glass: rgba(28, 28, 30, 0.7);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        body {
+            font-family: 'Satoshi-Variable', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg);
+            color: var(--fg);
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        h1,
+        h2,
+        h3 {
+            font-family: 'Satoshi-Variable', sans-serif;
+            font-weight: 650;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 12vh 2rem 8rem 2rem;
+            flex-grow: 1;
+        }
+
+        .hero-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .hero-title-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .logo-container {
+            width: 56px;
+            height: 56px;
+            color: var(--fg);
+        }
+
+        .logo-container svg {
+            width: 100%;
+            height: 100%;
+            stroke: currentColor;
+            stroke-width: 0.6px;
+        }
+
+        h1 {
+            font-size: clamp(3rem, 7vw, 4.5rem);
+            margin: 0;
+            letter-spacing: -0.04em;
+            color: var(--fg);
+            line-height: 1;
+        }
+
+        p.subtitle {
+            font-size: clamp(1.1rem, 2.5vw, 1.4rem);
+            color: var(--fg);
+            max-width: 700px;
+            margin: 0 auto 2rem;
+            font-weight: 500;
+            letter-spacing: -0.01em;
+            opacity: 0.6;
+        }
+
+        .features-summary {
+            font-size: 1.1rem;
+            color: var(--muted);
+            max-width: 600px;
+            margin: 2rem auto 1.5rem;
+            line-height: 1.6;
+            font-weight: 500;
+            text-align: center;
+        }
+
+        /* Target the second summary specifically to reduce gap */
+        p.features-summary+p.features-summary {
+            margin-top: 1rem;
+        }
+
+        .features-summary strong {
+            color: var(--fg);
+        }
+
+        .footer-note {
+            margin-top: 2rem;
+            text-align: center;
+            font-size: 0.9rem;
+            color: var(--muted);
+            opacity: 0.6;
+        }
+
+        .footer-note a {
+            color: inherit;
+            text-decoration: underline;
+        }
+
+        /* --- Floating Toolbar --- */
+        .toolbar-wrapper {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            width: auto;
+            max-width: 90vw;
+        }
+
+        .toolbar {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.6rem 0.8rem;
+            background: var(--glass);
+            backdrop-filter: blur(24px) saturate(180%);
+            -webkit-backdrop-filter: blur(24px) saturate(180%);
+            border: 1px solid var(--border);
+            border-radius: 100px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+        }
+
+        .btn {
+            padding: 0.8rem 1.4rem;
+            border-radius: 100px;
+            font-weight: 600;
+            text-decoration: none;
+            font-size: 0.95rem;
+            cursor: pointer;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary {
+            background: var(--fg);
+            color: var(--bg);
+        }
+
+        .btn-primary:hover {
+            opacity: 0.9;
+            transform: scale(1.02);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--fg);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(0, 0, 0, 0.05);
+        }
+
+        [data-theme="dark"] .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .icon-only {
+            width: 44px;
+            height: 44px;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+
+        [data-theme="light"] .icon-sun {
+            display: none;
+        }
+
+        [data-theme="light"] .icon-moon {
+            display: block;
+        }
+
+        [data-theme="dark"] .icon-sun {
+            display: block;
+        }
+
+        [data-theme="dark"] .icon-moon {
+            display: none;
+        }
+
+        /* --- Spinning Wheel Background --- */
+        .wheel-bg {
+            position: fixed;
+            bottom: -4rem;
+            /* Adjusted slightly lower */
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            pointer-events: none;
+            z-index: 0;
+            /* perspective tilt matching the React component */
+            perspective: 1200px;
+        }
+
+        .wheel-perspective {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%) perspective(1200px) rotateX(15deg);
+            transform-origin: center bottom;
+            width: 0;
+            height: 0;
+        }
+
+        .wheel-ring {
+            position: absolute;
+            border-radius: 50%;
+            overflow: visible;
+        }
+
+        .wheel-ring img {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        /* Outer ring – clockwise */
+        .wheel-ring-outer {
+            width: 0;
+            height: 0;
+            animation: spin-cw 40s linear infinite;
+        }
+
+        .wheel-ring-outer img {
+            width: 1600px;
+            height: 1600px;
+            margin-left: -800px;
+            margin-top: -800px;
+            opacity: 0.35;
+        }
+
+        /* Middle ring – counter-clockwise */
+        .wheel-ring-mid {
+            width: 0;
+            height: 0;
+            animation: spin-ccw 30s linear infinite;
+        }
+
+        .wheel-ring-mid img {
+            width: 900px;
+            height: 900px;
+            margin-left: -450px;
+            margin-top: -450px;
+            opacity: 0.45;
+        }
+
+        /* Inner ring – clockwise */
+        .wheel-ring-inner {
+            width: 0;
+            height: 0;
+            animation: spin-cw 20s linear infinite;
+        }
+
+        .wheel-ring-inner img {
+            width: 600px;
+            height: 600px;
+            margin-left: -300px;
+            margin-top: -300px;
+            opacity: 0.55;
+        }
+
+        @keyframes spin-cw {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes spin-ccw {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(-360deg);
+            }
+        }
+
+        /* Soften the wheel in light mode */
+        [data-theme="light"] .wheel-ring img {
+            filter: opacity(0.4);
+        }
+
+        [data-theme="dark"] .wheel-ring img {
+            filter: opacity(0.8);
+        }
+
+        /* --- Responsive --- */
+        @media (max-width: 600px) {
+            .container {
+                padding-top: 6vh;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <main class="container">
+        <section class="hero-section">
+            <div class="hero-title-row">
+                <div class="logo-container">
+                    <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path fill="currentColor"
+                            d="M27.328 12.036c-2.912-1.239-6.823-2.041-11-2.26a31.561 31.561 0 0 0-1.932-.057c3.088-3.771 6.401-6.303 8.583-6.385c.428-.016.792.073 1.084.26c.943.615 1.203 2.36.724 4.787c-.052.333.161.661.479.724a.612.612 0 0 0 .724-.479c.599-3.041.156-5.131-1.255-6.052c-.505-.333-1.12-.491-1.803-.464c-2.729.104-6.583 3.068-10.12 7.631a34.787 34.787 0 0 0-4.307.38c-.86-3.865-.521-6.636.792-7.303c.181-.099.38-.145.609-.167c.932-.072 2.213.527 3.615 1.693c.26.213.645.187.859-.079a.606.606 0 0 0-.077-.859c-1.683-1.391-3.229-2.073-4.496-1.98a2.976 2.976 0 0 0-1.072.292c-1.589.812-2.224 3.104-1.828 6.453c.093.692.213 1.416.391 2.156c-4.376.875-7.161 2.631-7.281 4.833c-.084 1.563 1.151 3.047 3.572 4.297a.608.608 0 0 0 .824-.265a.607.607 0 0 0-.267-.824c-1.932-.995-2.973-2.115-2.911-3.14c.068-1.443 2.364-2.923 6.349-3.708a36.4 36.4 0 0 0 1.4 4.119c-1.359 2.516-2.344 4.996-2.848 7.199c-.751 3.287-.349 5.631 1.145 6.599c.479.312 1.036.469 1.661.469c1.245 0 2.755-.615 4.464-1.833a.611.611 0 1 0-.71-.995c-2.057 1.473-3.791 1.963-4.749 1.337c-1.011-.661-1.235-2.588-.609-5.301c.421-1.849 1.208-3.907 2.276-6.027c.265.584.547 1.167.839 1.751c1.901 3.729 4.229 6.968 6.547 9.131c1.849 1.719 3.568 2.615 4.979 2.615c.469 0 .907-.1 1.303-.297c.1525-.781 2.188-2.948 1.864-6.099c-.296-2.953-1.411-6.548-3.14-10.136a.614.614 0 0 0-.812-.287a.614.614 0 0 0-.292.819c3.583 7.468 3.839 13.583 1.828 14.609c-2.125 1.088-7.235-3.141-11.188-10.907a35.953 35.953 0 0 1-1.203-2.573c.453-.807.932-1.625 1.464-2.437a43.578 43.578 0 0 1 1.629-2.328h.527c.719 0 1.5.016 2.312.063c8.703.459 14.631 3.416 14.511 5.781c-.052 1.02-1.235 2.052-3.235 2.828a.612.612 0 0 0 .443 1.14c2.541-.984 3.937-2.339 4.016-3.905c.093-1.772-1.557-3.48-4.667-4.803v-.011zm-16.557.563a38.93 38.93 0 0 0-1.016 1.661a31.419 31.419 0 0 1-.963-2.953a32.471 32.471 0 0 1 3.077-.323a33.25 33.25 0 0 0-1.093 1.615v-.015z" />
+                    </svg>
+                </div>
+                <h1>Critique</h1>
+            </div>
+            <p class="features-summary">Critique is a lightweight, distraction-free writing assistant for macOS. It
+                supports local Apple Silicon to provide private, powerful AI refinement across every application, with
+                or without the need for external APIs.</p>
+        </section>
+
+        <p class="features-summary">
+            Built with Swift and Apple MLX—fast, private, and works on all apps.
+        </p>
+
+        <footer class="footer-note">
+            <p>~<a href="https://www.x.com/prxshetty" target="_blank">Pranam</a></p>
+        </footer>
+    </main>
+
+    <!-- Spinning Wheel Decorative Background (centered on floatbar) -->
+    <div class="wheel-bg" aria-hidden="true">
+        <div class="wheel-perspective">
+            <!-- Outer ring: clockwise -->
+            <div class="wheel-ring wheel-ring-outer">
+                <img src="https://framerusercontent.com/images/oqZEqzDEgSLygmUDuZAYNh2XQ9U.png?scale-down-to=2048"
+                    alt="" />
+            </div>
+            <!-- Middle ring: counter-clockwise -->
+            <div class="wheel-ring wheel-ring-mid">
+                <img src="https://framerusercontent.com/images/UbucGYsHDAUHfaGZNjwyCzViw8.png?scale-down-to=1024"
+                    alt="" />
+            </div>
+            <!-- Inner ring: clockwise -->
+            <div class="wheel-ring wheel-ring-inner">
+                <img src="https://framerusercontent.com/images/Ans5PAxtJfg3CwxlrPMSshx2Pqc.png" alt="" />
+            </div>
+        </div>
+    </div>
+
+    <!-- Floating Action Toolbar -->
+    <div class="toolbar-wrapper">
+        <div class="toolbar">
+            <button class="theme-toggle btn btn-secondary icon-only" id="themeToggle" aria-label="Toggle Theme">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                    class="icon-sun">
+                    <circle cx="12" cy="12" r="5"></circle>
+                    <line x1="12" y1="1" x2="12" y2="3"></line>
+                    <line x1="12" y1="21" x2="12" y2="23"></line>
+                    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                    <line x1="1" y1="12" x2="3" y2="12"></line>
+                    <line x1="21" y1="12" x2="23" y2="12"></line>
+                    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                </svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                    class="icon-moon">
+                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                </svg>
+            </button>
+            <a href="https://github.com/prxshetty/Critique" class="btn btn-secondary">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path
+                        d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22">
+                    </path>
+                </svg>
+                <span>GitHub</span>
+            </a>
+            <a href="https://github.com/prxshetty/Critique/releases" class="btn btn-primary">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="7 10 12 15 17 10"></polyline>
+                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+                <span>Download for Mac</span>
+            </a>
+        </div>
+    </div>
+
+    <script>
+        const themeToggle = document.getElementById('themeToggle');
+        const html = document.documentElement;
+
+        // Load saved theme
+        const savedTheme = localStorage.getItem('theme') ||
+            (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+
+        html.setAttribute('data-theme', savedTheme);
+
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+        });
+
+        // Add some scroll reveal magic
+        const observerOptions = {
+            threshold: 0.1
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.hero-section *, .features-summary, .footer-note').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(20px)';
+            el.style.transition = 'all 0.6s cubic-bezier(0.22, 1, 0.36, 1)';
+            observer.observe(el);
+        });
+    </script>
+</body>
+
+</html>
