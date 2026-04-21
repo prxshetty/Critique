@@ -19,9 +19,6 @@ struct OnboardingWelcomeStep: View {
   var body: some View {
     VStack(alignment: .leading, spacing: 32) {
       VStack(alignment: .leading, spacing: 8) {
-        Text("Hey there 👋")
-          .font(.system(size: 32, weight: .bold))
-        
         Text("Welcome to Critique")
           .font(.system(size: 32, weight: .bold))
         

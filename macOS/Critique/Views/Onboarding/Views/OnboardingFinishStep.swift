@@ -7,104 +7,91 @@ import SwiftUI
 
 struct OnboardingFinishStep: View {
   var body: some View {
-    VStack(spacing: 24) {
-      VStack(spacing: 12) {
-        // Hero Logo
-        Image("MenuBarIcon")
-          .resizable()
-          .scaledToFit()
-          .frame(width: 80, height: 80)
-          .padding(.top, 20)
-
+    VStack(alignment: .leading, spacing: 48) {
+      // Header Section
+      VStack(alignment: .leading, spacing: 16) {
         Text("You're all set!")
-          .font(.system(size: 32, weight: .bold))
+          .font(.system(size: 36, weight: .bold))
+        
+        Text("Critique works by briefly copying your selection, enhancing it via AI, and pasting the results back seamlessly into your original app.")
+          .font(.title3)
+          .foregroundStyle(.secondary)
+          .lineSpacing(6)
+          .fixedSize(horizontal: false, vertical: true)
       }
+      .padding(.top, 20)
 
-      // Features List
-      VStack(spacing: 12) {
-        FeatureRow(
-          icon: "pencil.and.outline",
-          text: "Improve your writing with one shortcut"
-        )
-        FeatureRow(
-          icon: "cursorarrow.rays",
-          text: "Works in any app that supports copy & paste"
-        )
-        FeatureRow(
-          icon: "text.justify.left",
-          text: "Preserves formatting for supported apps"
-        )
-        FeatureRow(
-          icon: "command.square",
-          text: "Custom commands & per-command shortcuts"
-        )
-      }
-      .padding(.horizontal, 4)
-
-      // How it works card
-      VStack(alignment: .leading, spacing: 10) {
-        Text("How it works")
+      // Features Grid
+      VStack(alignment: .leading, spacing: 24) {
+        Text("Key Features")
           .font(.headline)
           .foregroundStyle(.primary)
 
-        Text(
-          "Critique briefly copies your selection, sends it to your chosen AI provider (or a local model), and then pastes the result back results seamlessly."
-        )
-        .font(.subheadline)
-        .foregroundStyle(.secondary)
-        .lineSpacing(4)
-        .fixedSize(horizontal: false, vertical: true)
-      }
-      .padding(16)
-      .frame(maxWidth: .infinity, alignment: .leading)
-      .background(
-        RoundedRectangle(cornerRadius: 16)
-          .fill(Color.primary.opacity(0.04))
-          .overlay(
-            RoundedRectangle(cornerRadius: 16)
-              .stroke(Color.primary.opacity(0.08), lineWidth: 1)
+        LazyVGrid(columns: [
+          GridItem(.flexible(), spacing: 32, alignment: .topLeading),
+          GridItem(.flexible(), spacing: 32, alignment: .topLeading)
+        ], spacing: 32) {
+          FeatureItem(
+            icon: "pencil.and.outline",
+            text: "Improve writing with one shortcut"
           )
-      )
-      .padding(.horizontal, 4)
+          FeatureItem(
+            icon: "cursorarrow.rays",
+            text: "Works in any app system-wide"
+          )
+          FeatureItem(
+            icon: "text.justify.left",
+            text: "Preserves original formatting"
+          )
+          FeatureItem(
+            icon: "command.square",
+            text: "Custom commands & shortcuts"
+          )
+        }
+      }
 
       Spacer()
 
-      VStack(spacing: 8) {
-        Text("If you like Critique, consider [starring on GitHub](https://github.com/prxshetty/Critique).")
-          .font(.subheadline)
-          .foregroundStyle(.secondary)
-          .accentColor(.primary)
+      // Footer
+      VStack(alignment: .leading, spacing: 12) {
+        Divider()
+          .padding(.bottom, 8)
+        
+        HStack(spacing: 12) {
+          Image("MenuBarIcon")
+            .resizable()
+            .scaledToFit()
+            .frame(width: 24, height: 24)
+          
+          Text("If you like Critique, consider [starring on GitHub](https://github.com/prxshetty/Critique).")
+            .font(.subheadline)
+            .foregroundStyle(.secondary)
+            .accentColor(.primary)
+        }
       }
-      .frame(maxWidth: .infinity, alignment: .center)
       .padding(.bottom, 20)
     }
+    .padding(.horizontal, 24)
   }
 }
 
-private struct FeatureRow: View {
+private struct FeatureItem: View {
   let icon: String
   let text: String
 
   var body: some View {
-    HStack(spacing: 16) {
+    HStack(alignment: .top, spacing: 12) {
       Image(systemName: icon)
-        .font(.title2)
+        .font(.system(size: 20))
         .foregroundStyle(.primary.opacity(0.8))
-        .frame(width: 32, alignment: .center)
+        .frame(width: 24, alignment: .center)
 
       Text(text)
-        .font(.body)
-        .foregroundStyle(.primary)
-      
-      Spacer()
+        .font(.subheadline)
+        .foregroundStyle(.secondary)
+        .lineLimit(2)
+        .fixedSize(horizontal: false, vertical: true)
     }
-    .padding(14)
-    .background(Color(NSColor.controlBackgroundColor).opacity(0.5))
-    .clipShape(.rect(cornerRadius: 12))
-    .overlay(
-        RoundedRectangle(cornerRadius: 12)
-            .stroke(Color.primary.opacity(0.05), lineWidth: 1)
-    )
   }
 }
 

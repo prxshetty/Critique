@@ -13,8 +13,6 @@ struct AnthropicProviderSettingsView: View {
 
   var body: some View {
     VStack(alignment: .leading, spacing: 12) {
-      Text("Configure Anthropic (Claude)")
-        .font(.headline)
       
       Grid(alignment: .leading, horizontalSpacing: 20, verticalSpacing: 12) {
         GridRow {

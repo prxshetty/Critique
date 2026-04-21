@@ -22,6 +22,7 @@ import ApplicationServices
               Text("Customize Appearance")
                 .font(.system(size: 32, weight: .bold))
             }
+            .padding(.top, 28) // Space for window controls
             .padding(.bottom, 24)
 
             ScrollView {
@@ -41,7 +42,7 @@ import ApplicationServices
 
           // Right Column (Visual Sandbox / Preview)
           ZStack {
-            Color.black.opacity(0.02) // subtle background
+            Color(NSColor.controlBackgroundColor)
               .ignoresSafeArea()
               
             // Live Sandbox for the Popup
@@ -51,12 +52,12 @@ import ApplicationServices
                   viewModel: PopupViewModel(),
                   closeAction: {}
                 )
-                .frame(width: 400, height: 400)
+                .frame(width: 380, height: 380)
                 .disabled(true)
-                .shadow(color: .black.opacity(0.1), radius: 20, y: 10)
-                .scaleEffect(0.8) // Scale down the popup slightly to fit the mockup better
+                .shadow(color: .black.opacity(0.1), radius: 10, y: 5)
+                .scaleEffect(0.85)
             }
-            .scaleEffect(0.95)
+            .scaleEffect(1.0)
           }
           .frame(width: 520)
           .overlay(
@@ -76,11 +77,15 @@ import ApplicationServices
               wantsScreenshotOCR: $settings.wantsScreenshotOCR,
               onRefresh: refreshPermissionStatuses
             )
-            .padding(40)
+            .padding(.top, 40) // Space for window controls
+            .padding(.horizontal, 40)
+            .padding(.bottom, 40)
             .frame(maxWidth: .infinity, minHeight: 600)
           } else {
             OnboardingFinishStep()
-            .padding(40)
+            .padding(.top, 40) // Space for window controls
+            .padding(.horizontal, 40)
+            .padding(.bottom, 40)
             .frame(maxWidth: .infinity, minHeight: 600)
           }
         }

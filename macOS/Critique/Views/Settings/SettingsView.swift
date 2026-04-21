@@ -78,7 +78,7 @@ struct SettingsView: View {
                 }
                 Spacer()
             }
-            .padding(.top, 8)
+            .padding(.top, 24)
             .background(Color.black.opacity(0.03))
             
             Divider()

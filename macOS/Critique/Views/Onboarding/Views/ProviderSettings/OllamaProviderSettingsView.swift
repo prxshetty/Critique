@@ -12,9 +12,6 @@ struct OllamaProviderSettingsView: View {
 
   var body: some View {
     VStack(alignment: .leading, spacing: 12) {
-      Text("Configure Ollama (Self-Hosted)")
-        .font(.headline)
-      
       Grid(alignment: .leading, horizontalSpacing: 20, verticalSpacing: 12) {
         GridRow {
           Text("Base URL:")

@@ -12,9 +12,6 @@ struct MistralProviderSettingsView: View {
 
   var body: some View {
     VStack(alignment: .leading, spacing: 12) {
-      Text("Configure Mistral AI")
-        .font(.headline)
-      
       Grid(alignment: .leading, horizontalSpacing: 20, verticalSpacing: 12) {
         GridRow {
           Text("API Key:")
