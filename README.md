@@ -1,22 +1,27 @@
-# Critique
+<div align="center">
+  <img src="docs/logo.png" width="200" height="200" alt="Critique Logo">
+  <h1>Critique</h1>
+</div>
 
 > **System-wide AI writing superpowers.** Minimal, privacy-first, and insanely fast text transformation for macOS.
 
-Critique is a native writing assistant that supercharges your workflow. With one hotkey, instantly proofread, rewrite, or summarize text across any application.
+Critique is a lightweight, distraction-free writing assistant for macOS. It supports local Apple Silicon to provide private, powerful AI refinement across every application, with or without the need for external APIs.
+
+Built with Swift and Apple MLX—fast, private, and works on all apps.
 
 ---
 
-## ⚡ Highlights
+## Highlights
 
-- **Surgical Text Transformation**: Select text anywhere and invoke Critique (`Cmd + Space`). Your text is instantly replaced with the AI-optimized version.
+- **Surgical Text Transformation**: Select text anywhere and invoke Critique with your hotkey. Your text is instantly replaced with the AI-optimized version.
 - **Truly Native**: Built in Swift/SwiftUI. Uses ~0% CPU when idle and remains responsive even under load.
-- **Privacy-First**: No data collection. Keys are secured in the macOS Keychain. Use local models for 100% on-device processing.
+- **Privacy-First**: No data collection. Use local models for 100% on-device processing.
 - **Rich Text Aware**: Proofread preserves RTF formatting (bold, italics, etc.) so your documents stay styled.
-- **Customizable**: Create your own "magic buttons" with custom instructions and shortcuts.
+- **Customizable**: Create your own "tones" with custom instructions and shortcuts.
 
 ---
 
-## 🚀 Quick Start
+## Quick Start
 
 1. **Download** the latest `.dmg` from [Releases](https://github.com/prxshetty/Critique/releases).
 2. **Install** by dragging **Critique.app** into your Applications folder.
@@ -33,20 +38,18 @@ Critique is a native writing assistant that supercharges your workflow. With one
 
 ---
 
-## 🧠 Providers & Models
+## Providers & Models
 
 Critique lets you mix & match based on your needs:
 - **Local (Privacy)**: Use **Apple Intelligence** or **MLX on Apple Silicon** for low-latency, on-device inference.
-- **Cloud (Power)**: Use GPT-4o, Claude 3.5, or Gemini Pro for complex tasks.
+- **Cloud (Power)**: Use GPT-5, Claude 4.6, or Gemini Pro for complex tasks.
 - **OpenAI-Compatible**: Seamlessly connect to **Ollama** or other local servers.
 
 ---
 
-## 📄 License & Contributing
+## License & Credits
 
 Critique is distributed under the GNU General Public License v3.0.  
-Interested in contributing? Check our [todo.md](todo.md).
+*Based on the [WritingTools](https://github.com/theJayTea/WritingTools) project.*
 
 ---
-
-[**Development & Build Instructions**](README's%20Linked%20Content/To%20Run%20Critique%20Directly%20from%20the%20Source%20Code.md)
