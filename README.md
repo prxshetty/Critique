@@ -29,6 +29,14 @@ Critique is a lightweight, distraction-free writing assistant for macOS. It supp
 
 1. **Download** the latest `.dmg` from [Releases](https://github.com/prxshetty/Critique/releases).
 2. **Install** by dragging **Critique.app** into your Applications folder.
+
+> [!IMPORTANT]
+> **Security Note (macOS Gatekeeper)**  
+> Because Critique is currently in early development and not yet notarized by Apple, macOS will block it from opening.  
+> **To resolve this:**  
+> - **Method A:** **Right-click** (or Control-click) the app in your Applications folder and select **Open**, then click **Open** again in the dialog.  
+> - **Method B:** Go to **System Settings > Privacy & Security**, scroll down to the **Security** section, and click **Open Anyway**.
+
 3. **Permissions**: Grant **Accessibility** access (required to read/replace text).
 4. **Setup**: Choose your provider in Settings:
    - **Cloud**: OpenAI, Google (Gemini), Anthropic, Mistral, OpenRouter.
