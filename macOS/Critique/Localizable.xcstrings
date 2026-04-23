@@ -2366,6 +2366,9 @@
     "Critique works by briefly copying your selection, enhancing it via AI, and pasting the results back seamlessly into your original app." : {
 
     },
+    "Critiquing..." : {
+
+    },
     "Custom" : {
       "localizations" : {
         "de" : {

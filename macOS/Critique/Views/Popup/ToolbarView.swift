@@ -40,11 +40,11 @@ struct ToolbarView: View {
     private var isGradient: Bool { settings.themeStyle == .gradient }
     
     private var primaryColor: Color {
-        isGradient ? .white : .primary
+        isGradient ? .white.opacity(0.9) : .primary
     }
     
     private var secondaryColor: Color {
-        isGradient ? .white.opacity(0.8) : .secondary
+        isGradient ? .white.opacity(0.6) : .secondary
     }
     
     private var backgroundStyle: AnyShapeStyle {
@@ -56,9 +56,10 @@ struct ToolbarView: View {
             // ── Text input ──────────────────────────────────────────────
             ZStack(alignment: .leading) {
                 if customText.isEmpty {
-                    Text("Ask Critique...")
+                    Text(isProcessing ? "Critiquing..." : "Ask Critique...")
                         .foregroundStyle(secondaryColor)
                         .padding(.leading, 14)
+                        .shimmer(isActive: isProcessing)
                 }
                 
                 TextField(
@@ -96,7 +97,7 @@ struct ToolbarView: View {
                         
                         Image(systemName: selectedCommand?.icon ?? "sparkles")
                             .font(DesignSystem.iconFont)
-                            .foregroundStyle(primaryColor)
+                            .foregroundStyle(secondaryColor)
                     }
                     .frame(width: DesignSystem.buttonSize, height: DesignSystem.buttonSize)
                 } else {
@@ -105,16 +106,20 @@ struct ToolbarView: View {
                         if hasIcon {
                             Image(systemName: selectedCommand?.icon ?? "sparkles")
                                 .font(DesignSystem.iconFont)
-                                .foregroundStyle(primaryColor)
+                                .foregroundStyle(secondaryColor)
                         }
                         Text(selectedCommand?.name ?? "Tone")
                             .font(DesignSystem.iconFont)
-                            .foregroundStyle(primaryColor)
+                            .foregroundStyle(secondaryColor)
+                            .lineLimit(1)
+                            .truncationMode(.tail)
+                            .frame(maxWidth: 80)
                             
                         Image(systemName: "chevron.down")
                             .font(DesignSystem.chevronFont)
                             .foregroundStyle(secondaryColor)
                     }
+                    .fixedSize()
                     .padding(.horizontal, 10)
                     .padding(.vertical, 5)
                     .background(
@@ -129,7 +134,9 @@ struct ToolbarView: View {
 
             // ── Submit ──────────────────────────────────────────────────
             Button {
-                if !customText.isEmpty {
+                if isProcessing {
+                    stopProcessing()
+                } else if !customText.isEmpty {
                     runCustomAction()
                 } else if let command = selectedCommand {
                     execute(command)
@@ -137,18 +144,23 @@ struct ToolbarView: View {
             } label: {
                 Group {
                     if isProcessing {
-                        ProgressView()
-                            .controlSize(.small)
-                            .scaleEffect(0.7)
+                        ZStack {
+                            Circle()
+                                .fill(backgroundStyle)
+                            
+                            Image(systemName: "square.fill")
+                                .font(DesignSystem.buttonIconFont)
+                                .foregroundStyle(secondaryColor)
+                        }
                     } else {
                         ZStack {
                             Circle()
                                 .fill(backgroundStyle)
-                                .opacity((selectedCommand != nil && !isProcessing) ? 1.0 : 0.4)
+                                .opacity((selectedCommand != nil) ? 1.0 : 0.4)
                             
                             Image(systemName: "arrow.up")
                                 .font(DesignSystem.buttonIconFont)
-                                .foregroundStyle(primaryColor)
+                                .foregroundStyle(secondaryColor)
                         }
                     }
                 }
@@ -156,7 +168,7 @@ struct ToolbarView: View {
 
             }
             .buttonStyle(.plain)
-            .disabled(selectedCommand == nil || isProcessing)
+            .disabled(selectedCommand == nil && !isProcessing)
             .padding(.leading, 2)
             .padding(.trailing, 8) 
         }
@@ -177,14 +189,22 @@ struct ToolbarView: View {
     }
 
     private func runCustomAction() {
-        guard !isProcessing, !customText.isEmpty else { return }
+        guard !customText.isEmpty else { return }
+        let promptToRun = customText
+        customText = "" // Clear to show "Critiquing..." placeholder
+        
         let customCommand = CommandModel(
             name: "Critique Instruction",
-            prompt: customText,
+            prompt: promptToRun,
             icon: "sparkles",
             isBuiltIn: false
         )
         execute(customCommand)
+    }
+
+    private func stopProcessing() {
+        appState.activeProvider.cancel()
+        // Note: isProcessing will be set to false by the execute task completing/throwing
     }
 
     private func execute(_ command: CommandModel) {
@@ -200,6 +220,50 @@ struct ToolbarView: View {
                 print("Execution failed: \(error)")
             }
             isProcessing = false
+        }
+    }
+}
+
+// MARK: - Shimmer Effect
+
+extension View {
+    @ViewBuilder
+    func shimmer(isActive: Bool) -> some View {
+        if isActive {
+            self.overlay(
+                GeometryReader { geo in
+                    ShimmerOverlay()
+                        .frame(width: geo.size.width * 2)
+                        .offset(x: -geo.size.width)
+                }
+                .clipped()
+                .allowsHitTesting(false)
+            )
+            .mask(self)
+        } else {
+            self
+        }
+    }
+}
+
+struct ShimmerOverlay: View {
+    @State private var offset: CGFloat = 0
+
+    var body: some View {
+        LinearGradient(
+            stops: [
+                .init(color: .clear, location: 0.3),
+                .init(color: .white.opacity(0.6), location: 0.5),
+                .init(color: .clear, location: 0.7),
+            ],
+            startPoint: .leading,
+            endPoint: .trailing
+        )
+        .offset(x: offset)
+        .onAppear {
+            withAnimation(.linear(duration: 1.4).repeatForever(autoreverses: false)) {
+                offset = 300
+            }
         }
     }
 }
