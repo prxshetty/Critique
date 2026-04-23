@@ -21,13 +21,6 @@ You can build the Critique macOS app using Xcode 15 or later:
 
 ---
 
-## Compilation (Windows)
-
-Detailed instructions for compiling the Windows application can be found in:
-README's Linked Content/To Compile the Application Yourself.md
-
----
-
 ## Distributing (Free Method)
 
 If you don't have a paid Apple Developer account, you can still distribute Critique using the provided `package.sh` script.

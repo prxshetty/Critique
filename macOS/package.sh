@@ -31,9 +31,9 @@ xcodebuild build \
     -scheme "$SCHEME" \
     -configuration Release \
     -derivedDataPath "$BUILD_DIR" \
-    CODE_SIGN_IDENTITY="" \
-    CODE_SIGNING_REQUIRED=NO \
-    CODE_SIGNING_ALLOWED=NO
+    CODE_SIGN_IDENTITY="-" \
+    CODE_SIGNING_REQUIRED=YES \
+    CODE_SIGNING_ALLOWED=YES
 
 if [ $? -ne 0 ]; then
     echo -e "${RED}xcodebuild failed. Check the error above.${NC}"
