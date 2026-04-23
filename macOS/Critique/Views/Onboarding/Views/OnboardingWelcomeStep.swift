@@ -46,10 +46,6 @@ struct OnboardingWelcomeStep: View {
           explanation: "Required to simulate ⌘C/⌘V for copying your selection and pasting results back into the original app.",
           onPrimary: {
             PermissionsHelper.requestAccessibility()
-            Task { @MainActor in
-              try? await Task.sleep(for: .milliseconds(500))
-              onRefresh()
-            }
           }
         )
           

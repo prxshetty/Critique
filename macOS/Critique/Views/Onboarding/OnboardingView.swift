@@ -125,7 +125,7 @@ import ApplicationServices
           }
           .buttonStyle(.borderedProminent)
           .controlSize(.large)
-          .disabled(currentStep == 0 && (!isAccessibilityGranted || (settings.wantsScreenshotOCR && !isScreenRecordingGranted)))
+          .disabled(isNextDisabled)
         } else {
           Button("Finish") {
             saveSettingsAndFinish()
@@ -145,6 +145,32 @@ import ApplicationServices
     )
     .onAppear {
       refreshPermissionStatuses()
+    }
+    .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in
+      refreshPermissionStatuses()
+    }
+  }
+
+  private var isNextDisabled: Bool {
+    if currentStep == 0 {
+      return !isAccessibilityGranted || (settings.wantsScreenshotOCR && !isScreenRecordingGranted)
+    } else if currentStep == 1 {
+      return !isProviderConfigured
+    }
+    return false
+  }
+
+  private var isProviderConfigured: Bool {
+    switch settings.currentProvider {
+    case "gemini": return !settings.geminiApiKey.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    case "openai": return !settings.openAIApiKey.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    case "mistral": return !settings.mistralApiKey.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    case "anthropic": return !settings.anthropicApiKey.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    case "openrouter": return !settings.openRouterApiKey.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    case "ollama": return !settings.ollamaBaseURL.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && !settings.ollamaModel.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    case "apple": return true
+    case "local": return true
+    default: return false
     }
   }
 
