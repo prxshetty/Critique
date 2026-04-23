@@ -1,6 +1,7 @@
 import SwiftUI
 
 class PopupWindow: NSWindow {
+  private var didInitialPositioning = false
   private var initialLocation: NSPoint?
   private var retainedHostingView: NSHostingView<PopupWindowContentView>?
   private var trackingArea: NSTrackingArea?
@@ -134,7 +135,6 @@ class PopupWindow: NSWindow {
       })
     } else {
       setContentSize(NSSize(width: windowWidth, height: contentHeight))
-
       if let screen = self.screen {
         var frame = self.frame
         frame.size.height = contentHeight
@@ -146,6 +146,11 @@ class PopupWindow: NSWindow {
         setFrame(frame, display: true)
       }
       setupTrackingArea()
+    }
+
+    if !didInitialPositioning {
+      didInitialPositioning = true
+      positionNearMouse()
     }
   }
 

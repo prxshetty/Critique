@@ -200,6 +200,11 @@ class WindowManager: NSObject, NSWindowDelegate {
     }
 
     func showOnboarding(appState: AppState, title: String = "Welcome to Critique") {
+        if let existing = onboardingWindow {
+            bringWindowToFront(existing)
+            return
+        }
+
         let window = NSWindow(
             contentRect: NSRect(x: 0, y: 0, width: 640, height: 720),
             styleMask: [.titled, .closable, .miniaturizable, .resizable, .fullSizeContentView],

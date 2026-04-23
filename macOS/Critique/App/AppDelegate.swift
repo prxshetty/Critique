@@ -234,14 +234,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
             self.appState.selectedText = capture.text
             self.appState.selectedImages = capture.images
 
+            
             let window = PopupWindow(appState: self.appState)
-            if !capture.text.isEmpty || !capture.images.isEmpty {
-                window.setContentSize(NSSize(width: 400, height: 400))
-            } else {
-                window.setContentSize(NSSize(width: 400, height: 100))
-            }
-
-            window.positionNearMouse()
             NSApp.activate()
             window.makeKeyAndOrderFront(nil)
             window.orderFrontRegardless()
