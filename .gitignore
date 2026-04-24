@@ -17,3 +17,7 @@ Windows_and_Linux/config.json
 **/xcuserdata/
 **/project.xcworkspace/xcuserdata/
 todo.md
+
+# Build artifacts
+*.dmg
+**/macOS/*.dmg
