@@ -13,6 +13,10 @@
 
 Critique is a lightweight, distraction-free writing assistant for macOS. It supports local Apple Silicon to provide private, powerful AI refinement across every application, with or without the need for external APIs.
 
+<p align="center">
+  <img src="assets/demo.gif" width="800" alt="Critique Demo">
+</p>
+
 ---
 
 ## Highlights
@@ -22,6 +26,20 @@ Critique is a lightweight, distraction-free writing assistant for macOS. It supp
 - **Privacy-First**: No data collection. Use local models for 100% on-device processing.
 - **Rich Text Aware**: Proofread preserves RTF formatting (bold, italics, etc.) so your documents stay styled.
 - **Customizable**: Create your own "tones" with custom instructions and shortcuts.
+
+---
+
+## Personalization
+
+Critique evolves the native writing tool experience with deep UI flexibility, allowing it to adapt to your specific workflow.
+
+- **Dynamic Layouts**: Switch between the traditional **Grid View** or the modern **Toolbar Layout** that places controls exactly where your eyes are.
+- **Adaptive Visuals**: Tailor the interface density by choosing to show **Icons**, **Labels**, or **Both** for your interaction buttons.
+- **One-Click Optimization**: Set a **Default Tone** to bypass menus. Select text, hit your hotkey, and click the primary action for immediate results.
+
+<p align="center">
+  <img src="assets/theme-view.png" width="800" alt="Critique Personalization">
+</p>
 
 ---
 
