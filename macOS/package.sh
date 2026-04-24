@@ -8,6 +8,9 @@ GREEN='\033[0;32m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
+# Change to the script's directory so paths are relative to the project
+cd "$(dirname "$0")"
+
 echo -e "${BLUE}==> Starting Critique Build & Packaging...${NC}"
 
 # 1. Configuration
