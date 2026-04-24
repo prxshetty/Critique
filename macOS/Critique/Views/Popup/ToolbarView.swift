@@ -1,4 +1,5 @@
 import SwiftUI
+import AppKit
 
 
 
@@ -7,12 +8,17 @@ struct ToolbarView: View {
     @State private var customText: String = ""
     @State private var isProcessing: Bool = false
     @State private var selectedCommandID: UUID? = nil
+    @State private var executionTask: Task<Void, Never>? = nil
 
     @Bindable private var settings = AppSettings.shared
     @Environment(\.colorScheme) var colorScheme
 
     let closeAction: () -> Void
     let moreAction: () -> Void
+
+    private var themeTokens: DesignSystem.ThemeTokens {
+        DesignSystem.tokens(for: settings.themeStyle)
+    }
 
     private var selectedCommand: CommandModel? {
         if let localId = selectedCommandID, let local = appState.commandManager.commands.first(where: { $0.id == localId }) {
@@ -36,19 +42,87 @@ struct ToolbarView: View {
         return other
     }
 
-    // MARK: - Gradient Theme Helpers
+    // MARK: - Theme Helpers
     private var isGradient: Bool { settings.themeStyle == .gradient }
+    private var isGlass: Bool { settings.themeStyle == .glass }
+    private var isOLED: Bool { settings.themeStyle == .oled }
+    private var isStandard: Bool { settings.themeStyle == .standard }
     
     private var primaryColor: Color {
-        isGradient ? .white.opacity(0.9) : .primary
+        if isGradient {
+            return .white.opacity(0.9)
+        }
+        if isGlass {
+            return colorScheme == .light
+                ? Color(nsColor: .labelColor)
+                : Color(nsColor: .textColor)
+        }
+        return .primary
     }
     
     private var secondaryColor: Color {
-        isGradient ? .white.opacity(0.6) : .secondary
+        if isGradient {
+            return .white.opacity(0.6)
+        }
+        if isGlass {
+            return colorScheme == .light
+                ? Color(nsColor: .secondaryLabelColor)
+                : Color(nsColor: .secondaryLabelColor)
+        }
+        return .secondary
+    }
+
+    private var loadingPlaceholderColor: Color {
+        themeTokens.toolbarLoadingTextColor(colorScheme)
+            .opacity(themeTokens.toolbarLoadingTextBaseOpacity)
     }
     
     private var backgroundStyle: AnyShapeStyle {
-        isGradient ? AnyShapeStyle(Color.white.opacity(0.18)) : AnyShapeStyle(.quaternary)
+        if isOLED {
+            return AnyShapeStyle(Color.clear)
+        }
+        if isGradient {
+            return AnyShapeStyle(Color.white.opacity(0.18))
+        }
+        if isGlass {
+            return AnyShapeStyle(
+                colorScheme == .light
+                    ? Color.black.opacity(0.06)
+                    : Color.white.opacity(0.08)
+            )
+        }
+        return AnyShapeStyle(.quaternary)
+    }
+
+    private var controlBorderColor: Color {
+        if isOLED {
+            return colorScheme == .light
+                ? Color.black.opacity(0.12)
+                : Color.white.opacity(0.18)
+        }
+        return .clear
+    }
+
+    private var standardSubmitBackgroundColor: Color {
+        colorScheme == .light ? Color.black.opacity(0.9) : Color.white.opacity(0.92)
+    }
+
+    private var standardSubmitIconColor: Color {
+        colorScheme == .light ? Color.white : Color.black.opacity(0.88)
+    }
+
+    private var textCursorColor: NSColor {
+        if isGradient {
+            return NSColor.white.withAlphaComponent(0.95)
+        }
+        if isGlass {
+            return colorScheme == .light
+                ? NSColor.labelColor.withAlphaComponent(0.9)
+                : NSColor.white.withAlphaComponent(0.95)
+        }
+        return colorScheme == .dark
+            ? NSColor.white.withAlphaComponent(0.92)
+            : NSColor.labelColor
     }
 
     var body: some View {
@@ -57,21 +131,30 @@ struct ToolbarView: View {
             ZStack(alignment: .leading) {
                 if customText.isEmpty {
                     Text(isProcessing ? "Critiquing..." : "Ask Critique...")
-                        .foregroundStyle(secondaryColor)
+                        .foregroundStyle(isProcessing ? loadingPlaceholderColor : secondaryColor)
                         .padding(.leading, 14)
-                        .shimmer(isActive: isProcessing)
+                        .shimmer(
+                            isActive: isProcessing,
+                            baseColor: themeTokens.toolbarLoadingTextColor(colorScheme),
+                            leadingOpacity: themeTokens.toolbarShimmerLeadingOpacity,
+                            midOpacity: themeTokens.toolbarShimmerMidOpacity,
+                            peakOpacity: themeTokens.toolbarShimmerPeakOpacity,
+                            trailingOpacity: themeTokens.toolbarShimmerTrailingOpacity,
+                            duration: themeTokens.toolbarShimmerDuration
+                        )
                 }
-                
-                TextField(
-                    "",
-                    text: $customText
+
+                ToolbarInputField(
+                    text: $customText,
+                    textColor: NSColor(primaryColor),
+                    cursorColor: textCursorColor,
+                    isEditable: !isProcessing,
+                    onSubmit: runCustomAction
                 )
-                .textFieldStyle(.plain)
-                .font(.system(size: 13, weight: .regular))
-                .foregroundStyle(primaryColor)
                 .padding(.leading, 14)
                 .padding(.trailing, 8)
-                .onSubmit { runCustomAction() }
+                .opacity(isProcessing ? 0.01 : 1)
+                .allowsHitTesting(!isProcessing)
             }
             .frame(minWidth: 100)
 
@@ -94,6 +177,12 @@ struct ToolbarView: View {
                     ZStack {
                         Circle()
                             .fill(backgroundStyle)
+                            .overlay {
+                                if isOLED {
+                                    Circle()
+                                        .strokeBorder(controlBorderColor, lineWidth: 1.0)
+                                }
+                            }
                         
                         Image(systemName: selectedCommand?.icon ?? "sparkles")
                             .font(DesignSystem.iconFont)
@@ -125,6 +214,12 @@ struct ToolbarView: View {
                     .background(
                         Capsule()
                             .fill(backgroundStyle)
+                            .overlay {
+                                if isOLED {
+                                    Capsule()
+                                        .strokeBorder(controlBorderColor, lineWidth: 1.0)
+                                }
+                            }
                     )
                 }
             }
@@ -146,21 +241,33 @@ struct ToolbarView: View {
                     if isProcessing {
                         ZStack {
                             Circle()
-                                .fill(backgroundStyle)
+                                .fill(isStandard ? AnyShapeStyle(standardSubmitBackgroundColor) : backgroundStyle)
+                                .overlay {
+                                    if isOLED {
+                                        Circle()
+                                            .strokeBorder(controlBorderColor, lineWidth: 1.0)
+                                    }
+                                }
                             
                             Image(systemName: "square.fill")
                                 .font(DesignSystem.buttonIconFont)
-                                .foregroundStyle(secondaryColor)
+                                .foregroundStyle(isStandard ? standardSubmitIconColor : secondaryColor)
                         }
                     } else {
                         ZStack {
                             Circle()
-                                .fill(backgroundStyle)
+                                .fill(isStandard ? AnyShapeStyle(standardSubmitBackgroundColor) : backgroundStyle)
+                                .overlay {
+                                    if isOLED {
+                                        Circle()
+                                            .strokeBorder(controlBorderColor, lineWidth: 1.0)
+                                    }
+                                }
                                 .opacity((selectedCommand != nil) ? 1.0 : 0.4)
                             
                             Image(systemName: "arrow.up")
                                 .font(DesignSystem.buttonIconFont)
-                                .foregroundStyle(secondaryColor)
+                                .foregroundStyle(isStandard ? standardSubmitIconColor : secondaryColor)
                         }
                     }
                 }
@@ -176,7 +283,7 @@ struct ToolbarView: View {
         .windowBackground(shape: Capsule())
         .overlay(
             Capsule()
-                .strokeBorder(DesignSystem.tokens(for: settings.themeStyle).borderColor(colorScheme), lineWidth: 1.0)
+                .strokeBorder(themeTokens.borderColor(colorScheme), lineWidth: 1.0)
         )
         // Shadow is now handled by the windowBackground modifier which pulls from DesignSystem
         .padding(.horizontal, 2)
@@ -203,23 +310,34 @@ struct ToolbarView: View {
     }
 
     private func stopProcessing() {
+        executionTask?.cancel()
+        executionTask = nil
         appState.activeProvider.cancel()
-        // Note: isProcessing will be set to false by the execute task completing/throwing
+        appState.isProcessing = false
+        isProcessing = false
     }
 
     private func execute(_ command: CommandModel) {
+        executionTask?.cancel()
         isProcessing = true
-        Task { @MainActor in
+        
+        executionTask = Task { @MainActor in
+            defer {
+                isProcessing = false
+                executionTask = nil
+            }
+            
             do {
                 try await CommandExecutionEngine.shared.executeCommand(
                     command,
                     source: .popup,
                     closePopupOnInlineCompletion: closeAction
                 )
+            } catch is CancellationError {
+                // Ignore cancellation - user clicked stop
             } catch {
                 print("Execution failed: \(error)")
             }
-            isProcessing = false
         }
     }
 }
@@ -228,11 +346,26 @@ struct ToolbarView: View {
 
 extension View {
     @ViewBuilder
-    func shimmer(isActive: Bool) -> some View {
+    func shimmer(
+        isActive: Bool,
+        baseColor: Color = .white,
+        leadingOpacity: Double = 0.18,
+        midOpacity: Double = 0.55,
+        peakOpacity: Double = 1.0,
+        trailingOpacity: Double = 0.4,
+        duration: Double = 4.0
+    ) -> some View {
         if isActive {
             self.overlay(
                 GeometryReader { geo in
-                    ShimmerOverlay()
+                    ShimmerOverlay(
+                        baseColor: baseColor,
+                        leadingOpacity: leadingOpacity,
+                        midOpacity: midOpacity,
+                        peakOpacity: peakOpacity,
+                        trailingOpacity: trailingOpacity,
+                        duration: duration
+                    )
                         .frame(width: geo.size.width * 2)
                         .offset(x: -geo.size.width)
                 }
@@ -247,23 +380,136 @@ extension View {
 }
 
 struct ShimmerOverlay: View {
-    @State private var offset: CGFloat = 0
+    let baseColor: Color
+    let leadingOpacity: Double
+    let midOpacity: Double
+    let peakOpacity: Double
+    let trailingOpacity: Double
+    let duration: Double
+
+    @State private var travel: CGFloat = -1.2
 
     var body: some View {
-        LinearGradient(
-            stops: [
-                .init(color: .clear, location: 0.3),
-                .init(color: .white.opacity(0.6), location: 0.5),
-                .init(color: .clear, location: 0.7),
-            ],
-            startPoint: .leading,
-            endPoint: .trailing
-        )
-        .offset(x: offset)
+        GeometryReader { geometry in
+            LinearGradient(
+                stops: [
+                    .init(color: .clear, location: 0.0),
+                    .init(color: baseColor.opacity(leadingOpacity), location: 0.24),
+                    .init(color: baseColor.opacity(midOpacity), location: 0.43),
+                    .init(color: baseColor.opacity(peakOpacity), location: 0.5),
+                    .init(color: baseColor.opacity(trailingOpacity), location: 0.57),
+                    .init(color: .clear, location: 0.82),
+                    .init(color: .clear, location: 1.0),
+                ],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+            .frame(width: geometry.size.width * 0.72, height: geometry.size.height * 2.1)
+            .rotationEffect(.degrees(-14))
+            .blendMode(.plusLighter)
+            .blur(radius: 4)
+            .offset(x: geometry.size.width * travel)
+        }
         .onAppear {
-            withAnimation(.linear(duration: 1.4).repeatForever(autoreverses: false)) {
-                offset = 300
+            travel = -1.2
+            withAnimation(.linear(duration: duration).repeatForever(autoreverses: false)) {
+                travel = 1.4
             }
         }
+    }
+}
+
+private struct ToolbarInputField: NSViewRepresentable {
+    @Binding var text: String
+    let textColor: NSColor
+    let cursorColor: NSColor
+    let isEditable: Bool
+    let onSubmit: () -> Void
+
+    func makeCoordinator() -> Coordinator {
+        Coordinator(text: $text, onSubmit: onSubmit)
+    }
+
+    func makeNSView(context: Context) -> PremiumToolbarTextField {
+        let textField = PremiumToolbarTextField()
+        textField.delegate = context.coordinator
+        textField.target = context.coordinator
+        textField.action = #selector(Coordinator.submit)
+        textField.isBordered = false
+        textField.drawsBackground = false
+        textField.focusRingType = .none
+        textField.bezelStyle = .roundedBezel
+        textField.font = NSFont.systemFont(ofSize: 13, weight: .regular)
+        textField.lineBreakMode = .byTruncatingTail
+        textField.maximumNumberOfLines = 1
+        textField.usesSingleLineMode = true
+        textField.isAutomaticTextCompletionEnabled = false
+        textField.cell?.wraps = false
+        return textField
+    }
+
+    func updateNSView(_ nsView: PremiumToolbarTextField, context: Context) {
+        if nsView.stringValue != text {
+            nsView.stringValue = text
+        }
+
+        nsView.textColor = textColor
+        nsView.insertionPointColor = cursorColor
+        nsView.isEditable = isEditable
+        nsView.isSelectable = isEditable
+
+        if isEditable {
+            nsView.alphaValue = 1
+        } else {
+            if nsView.window?.firstResponder === nsView.currentEditor() {
+                nsView.window?.makeFirstResponder(nil)
+            }
+            nsView.alphaValue = 0.01
+        }
+    }
+
+    final class Coordinator: NSObject, NSTextFieldDelegate {
+        @Binding var text: String
+        let onSubmit: () -> Void
+
+        init(text: Binding<String>, onSubmit: @escaping () -> Void) {
+            self._text = text
+            self.onSubmit = onSubmit
+        }
+
+        func controlTextDidChange(_ obj: Notification) {
+            guard let textField = obj.object as? NSTextField else { return }
+            text = textField.stringValue
+        }
+
+        @objc func submit() {
+            onSubmit()
+        }
+    }
+}
+
+private final class PremiumToolbarTextField: NSTextField {
+    var insertionPointColor: NSColor = .white {
+        didSet { applyInsertionPointColor() }
+    }
+
+    override func becomeFirstResponder() -> Bool {
+        let becameFirstResponder = super.becomeFirstResponder()
+        applyInsertionPointColor()
+        return becameFirstResponder
+    }
+
+    override func textDidBeginEditing(_ notification: Notification) {
+        super.textDidBeginEditing(notification)
+        applyInsertionPointColor()
+    }
+
+    override func viewDidMoveToWindow() {
+        super.viewDidMoveToWindow()
+        applyInsertionPointColor()
+    }
+
+    private func applyInsertionPointColor() {
+        (currentEditor() as? NSTextView)?.insertionPointColor = insertionPointColor
     }
 }
