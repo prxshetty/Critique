@@ -94,46 +94,42 @@ struct GlassmorphicBackground: View {
         ZStack {
             if reduceTransparency {
                 colorScheme == .light ? Color(.windowBackgroundColor) : Color.black
-            } else if #available(macOS 26.0, *) {
-                LiquidGlassBackground()
             } else {
-                LegacyGlassBackground(colorScheme: colorScheme)
+                CustomGlassBackground(colorScheme: colorScheme)
             }
         }
     }
 }
 
-/// Native Liquid Glass — macOS 26.0+
-@available(macOS 26.0, *)
-struct LiquidGlassBackground: View {
-    @Environment(\.colorScheme) var colorScheme
-
-    var body: some View {
-        Color.clear
-            .glassEffect(
-                .regular.tint(Color.white.opacity(colorScheme == .light ? 0.18 : 0.08)),
-                in: .rect(cornerRadius: 0)
-            )
-    }
-}
-
-/// Fallback glass for macOS < 26.0
-struct LegacyGlassBackground: View {
+/// App-defined glass treatment used across macOS versions so the theme
+/// stays visually stable instead of depending on the system Liquid Glass.
+struct CustomGlassBackground: View {
     let colorScheme: ColorScheme
 
     var body: some View {
         ZStack {
-            // backdrop-filter: blur(4px) -> we map this to standard responsive material.
-            Rectangle().fill(Material.ultraThin)
-
-            // background: warm neutral frost tint
             Rectangle()
-                .fill(Color.white.opacity(colorScheme == .light ? 0.18 : 0.08))
+                .fill(.ultraThinMaterial)
 
-            // border: defined frosted edge
+            Rectangle()
+                .fill(
+                    colorScheme == .light
+                        ? Color.white.opacity(0.72)
+                        : Color.white.opacity(0.08)
+                )
+
+            Rectangle()
+                .fill(
+                    colorScheme == .light
+                        ? Color.black.opacity(0.035)
+                        : Color.black.opacity(0.18)
+                )
+
             Rectangle()
                 .strokeBorder(
-                    Color.white.opacity(colorScheme == .light ? 0.5 : 0.25),
+                    colorScheme == .light
+                        ? Color.black.opacity(0.14)
+                        : Color.white.opacity(0.18),
                     lineWidth: 1.0
                 )
         }

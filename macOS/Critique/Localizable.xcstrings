@@ -275,11 +275,7 @@
         }
       }
     },
-    "About" : {
-
-    },
     "About Critique" : {
-      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -741,6 +737,7 @@
 
     },
     "App Reset Complete" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -7258,6 +7255,7 @@
       }
     },
     "Reset App" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -7302,6 +7300,7 @@
       }
     },
     "Reset Critique?" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -8342,6 +8341,7 @@
 
     },
     "The app has been reset. If you're still experiencing issues, try restarting the app." : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -8558,6 +8558,7 @@
       }
     },
     "This will reset windows and UI state. Your commands and settings will remain." : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {

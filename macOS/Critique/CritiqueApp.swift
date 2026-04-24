@@ -29,15 +29,9 @@ struct MenuBarMenu: View {
     @Bindable var settings: AppSettings
     @Environment(\.openSettings) private var openSettings
     
-    @State private var showResetConfirmation = false
-    @State private var showResetComplete = false
-    
     var body: some View {
-        // Settings - use Button with openSettings to ensure proper activation
         Button("Settings") {
             openSettings()
-            // For accessory apps, activate after opening so the window
-            // comes to front above other applications.
             Task { @MainActor in
                 await Task.yield()
                 if let settingsWindow = NSApp.windows.first(where: {
@@ -54,35 +48,10 @@ struct MenuBarMenu: View {
             settings.hotkeysPaused.toggle()
         }
         
-        Button("About") {
-            showAboutWindow()
-        }
-        
         Divider()
-        
-        Button("Reset App") {
-            showResetConfirmation = true
-        }
-        .dialogSeverity(.critical)
-        .confirmationDialog(
-            "Reset Critique?",
-            isPresented: $showResetConfirmation
-        ) {
-            Button("Reset", role: .destructive) {
-                WindowManager.shared.cleanupWindows()
-                showResetComplete = true
-            }
-            Button("Cancel", role: .cancel) {}
-        } message: {
-            Text("This will reset windows and UI state. Your commands and settings will remain.")
-        }
-        .alert(
-            "App Reset Complete",
-            isPresented: $showResetComplete
-        ) {
-            Button("OK") {}
-        } message: {
-            Text("The app has been reset. If you're still experiencing issues, try restarting the app.")
+
+        Button("About Critique") {
+            showAboutWindow()
         }
         
         Divider()
