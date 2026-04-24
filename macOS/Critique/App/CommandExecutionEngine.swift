@@ -110,6 +110,8 @@ final class CommandExecutionEngine {
       streaming: false
     )
 
+    try Task.checkCancellation()
+
     if input.source == .selectedText {
       result = Self.normalizedInlineReplacement(
         result,
@@ -122,6 +124,8 @@ final class CommandExecutionEngine {
     } else {
       appState.replaceSelectedText(with: result)
     }
+
+    try Task.checkCancellation()
 
     if source == .popup {
       closePopupOnInlineCompletion?()
@@ -193,6 +197,8 @@ final class CommandExecutionEngine {
       streaming: false
     )
 
+    try Task.checkCancellation()
+
     result = Self.normalizedInlineReplacement(
       result,
       originalSelectedText: selectedText
@@ -202,6 +208,8 @@ final class CommandExecutionEngine {
     } else {
       appState.replaceSelectedText(with: result)
     }
+
+    try Task.checkCancellation()
 
     if source == .popup {
       closePopupOnInlineCompletion?()
