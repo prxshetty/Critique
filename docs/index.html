@@ -20,16 +20,6 @@
             --glass: rgba(255, 255, 255, 0.7);
         }
 
-        [data-theme="dark"] {
-            /* Dark Theme */
-            --bg: #000000;
-            --fg: #f5f5f7;
-            --accent: #2997ff;
-            --muted: #a1a1a6;
-            --card-bg: rgba(28, 28, 30, 0.7);
-            --border: rgba(255, 255, 255, 0.1);
-            --glass: rgba(28, 28, 30, 0.7);
-        }
 
         * {
             margin: 0;
@@ -219,21 +209,6 @@
             border-radius: 50%;
         }
 
-        [data-theme="light"] .icon-sun {
-            display: none;
-        }
-
-        [data-theme="light"] .icon-moon {
-            display: block;
-        }
-
-        [data-theme="dark"] .icon-sun {
-            display: block;
-        }
-
-        [data-theme="dark"] .icon-moon {
-            display: none;
-        }
 
         /* --- Spinning Wheel Background --- */
         .wheel-bg {
@@ -340,12 +315,8 @@
         }
 
         /* Soften the wheel in light mode */
-        [data-theme="light"] .wheel-ring img {
+        .wheel-ring img {
             filter: opacity(0.4);
-        }
-
-        [data-theme="dark"] .wheel-ring img {
-            filter: opacity(0.8);
         }
 
         /* --- Responsive --- */
@@ -440,26 +411,6 @@
     <!-- Floating Action Toolbar -->
     <div class="toolbar-wrapper">
         <div class="toolbar">
-            <button class="theme-toggle btn btn-secondary icon-only" id="themeToggle" aria-label="Toggle Theme">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
-                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                    class="icon-sun">
-                    <circle cx="12" cy="12" r="5"></circle>
-                    <line x1="12" y1="1" x2="12" y2="3"></line>
-                    <line x1="12" y1="21" x2="12" y2="23"></line>
-                    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-                    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-                    <line x1="1" y1="12" x2="3" y2="12"></line>
-                    <line x1="21" y1="12" x2="23" y2="12"></line>
-                    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-                    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-                </svg>
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
-                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                    class="icon-moon">
-                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-                </svg>
-            </button>
             <a href="https://github.com/prxshetty/Critique" class="btn btn-secondary">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -483,22 +434,6 @@
     </div>
 
     <script>
-        const themeToggle = document.getElementById('themeToggle');
-        const html = document.documentElement;
-
-        // Load saved theme
-        const savedTheme = localStorage.getItem('theme') ||
-            (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-
-        html.setAttribute('data-theme', savedTheme);
-
-        themeToggle.addEventListener('click', () => {
-            const currentTheme = html.getAttribute('data-theme');
-            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-
-            html.setAttribute('data-theme', newTheme);
-            localStorage.setItem('theme', newTheme);
-        });
 
         // Add some scroll reveal magic
         const observerOptions = {
