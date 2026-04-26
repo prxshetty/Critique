@@ -4,7 +4,7 @@
     <source media="(prefers-color-scheme: light)" srcset="docs/assets/logo-dark.png">
     <img src="docs/assets/logo-light.png" alt="Critique" width="480">
   </picture>
-  <p><em style="margin-top: -110px; display: block;">AI writing superpower for macOS</em></p>
+  <p><em style="display: block;">AI writing superpower for macOS</em></p>
   <p>
     <img src="https://img.shields.io/badge/platform-macOS-lightgrey?style=flat-square">
     <img src="https://img.shields.io/badge/built%20with-Swift%20%26%20MLX-orange?style=flat-square">
