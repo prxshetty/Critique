@@ -1,17 +1,17 @@
 <div align="center">
-  <img src="docs/logo.png" width="60" alt="Critique Logo">
-  <h1>Critique</h1>
-  <p><em>System-wide AI writing superpowers for macOS</em></p>
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/assets/logo-light.png">
+    <source media="(prefers-color-scheme: light)" srcset="docs/assets/logo-dark.png">
+    <img src="docs/assets/logo-light.png" alt="Critique" width="480">
+  </picture>
+  <p><em style="margin-top: -110px; display: block;">AI writing superpower for macOS</em></p>
   <p>
     <img src="https://img.shields.io/badge/platform-macOS-lightgrey?style=flat-square">
     <img src="https://img.shields.io/badge/built%20with-Swift%20%26%20MLX-orange?style=flat-square">
     <img src="https://img.shields.io/badge/privacy-first-green?style=flat-square">
   </p>
 </div>
-<p align="center"><strong>System-wide AI writing superpowers.</strong> Minimal, privacy-first, and insanely fast text transformation for macOS.</p>
-
-
-Critique is a lightweight, distraction-free writing assistant for macOS. It supports local Apple Silicon to provide private, powerful AI refinement across every application, with or without the need for external APIs.
+<p align="center">Minimal, fast, and private text transformation for macOS. A lightweight, distraction-free writing assistant with native MLX support and a refined UI — built on WritingTools with major performance and stability improvements.</p>
 
 <p align="center">
   <img src="docs/assets/demo.gif" width="800" alt="Critique Demo">
