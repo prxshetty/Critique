@@ -48,12 +48,21 @@ Critique evolves the native writing tool experience with deep UI flexibility, al
 1. **Download** the latest `.dmg` from [Releases](https://github.com/prxshetty/Critique/releases).
 2. **Install** by dragging **Critique.app** into your Applications folder.
 
-> [!IMPORTANT]
+
 > **Security Note (macOS Gatekeeper)**  
-> Because Critique is currently in early development and not yet notarized by Apple, macOS will block it from opening.  
+> Because Critique is currently in early development and not yet notarized by Apple, macOS will block it from opening initially.
+>
+> <p align="center">
+>   <img src="docs/assets/open-error.png" width="400" alt="macOS Security Warning">
+> </p>
+>
 > **To resolve this:**  
 > - **Method A:** **Right-click** (or Control-click) the app in your Applications folder and select **Open**, then click **Open** again in the dialog.  
 > - **Method B:** Go to **System Settings > Privacy & Security**, scroll down to the **Security** section, and click **Open Anyway**.
+>
+> <p align="center">
+>   <img src="docs/assets/privacy-setting.png" width="600" alt="Open Anyway in Settings">
+> </p>
 
 3. **Permissions**: Grant **Accessibility** access (required to read/replace text).
 4. **Setup**: Choose your provider in Settings:
