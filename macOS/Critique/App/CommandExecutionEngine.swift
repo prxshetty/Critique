@@ -69,18 +69,22 @@ final class CommandExecutionEngine {
 
     let input: CommandExecutionInput
     let provider: any AIProvider
-    let shouldUseResponseWindow: Bool
 
     do {
       try await prepareSelectionIfNeeded(for: source, commandName: command.name)
       try validateCustomProviderConfiguration(for: command)
       input = try await appState.resolveCommandInput(mode: .textOrImagesWithOCRFallback)
       provider = appState.getProvider(for: command)
-      shouldUseResponseWindow = command.useResponseWindow || input.source == .imageOCRFallback
     } catch {
       appState.isProcessing = false
       throw error
     }
+
+    let settings = AppSettings.shared
+    let shouldUseResponseWindow = command.useResponseWindow 
+        || (command.isBuiltIn && settings.openBuiltInCommandsInResponseView)
+        || (!command.isBuiltIn && settings.openCustomCommandsInResponseView)
+        || input.source == .imageOCRFallback
 
     if shouldUseResponseWindow {
       // Response windows manage their own processing lifecycle independently,

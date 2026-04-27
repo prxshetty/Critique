@@ -184,10 +184,10 @@ final class AppSettings {
     }
     
     // MARK: - Custom Commands Settings
-    var openCustomCommandsInResponseWindow: Bool {
-        didSet { defaults.set(openCustomCommandsInResponseWindow, forKey: "open_custom_commands_in_response_window") }
+    var openBuiltInCommandsInResponseView: Bool {
+        didSet { defaults.set(openBuiltInCommandsInResponseView, forKey: "open_built_in_commands_in_response_view") }
     }
-
+    
     var wantsScreenshotOCR: Bool {
         didSet { defaults.set(wantsScreenshotOCR, forKey: "wants_screenshot_ocr") }
     }
@@ -282,8 +282,12 @@ final class AppSettings {
         self.openRouterModel = defaults.string(forKey: "openrouter_model") ?? OpenRouterConfig.defaultModel
         self.openRouterCustomModel = defaults.string(forKey: "openrouter_custom_model") ?? ""
         
-        // Custom commands setting - default to true (open in response window)
-        self.openCustomCommandsInResponseWindow = defaults.object(forKey: "open_custom_commands_in_response_window") as? Bool ?? true
+        // Custom commands setting - migrate old key if exists
+        if defaults.object(forKey: "open_custom_commands_in_response_window") != nil {
+            defaults.removeObject(forKey: "open_custom_commands_in_response_window")
+        }
+        self.openBuiltInCommandsInResponseView = defaults.object(forKey: "open_built_in_commands_in_response_view") as? Bool ?? false
+        self.openCustomCommandsInResponseView = defaults.object(forKey: "open_custom_commands_in_response_view") as? Bool ?? false
         
         self.wantsScreenshotOCR = defaults.bool(forKey: "wants_screenshot_ocr")
 

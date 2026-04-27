@@ -300,13 +300,18 @@ struct ToolbarView: View {
         let promptToRun = customText
         customText = "" // Clear to show "Critiquing..." placeholder
         
-        let customCommand = CommandModel(
-            name: "Critique Instruction",
-            prompt: promptToRun,
-            icon: "sparkles",
-            isBuiltIn: false
-        )
-        execute(customCommand)
+        Task {
+            do {
+                try await CommandExecutionEngine.shared.executeCustomInstruction(
+                    promptToRun,
+                    source: .popup,
+                    openInResponseWindow: true,
+                    closePopupOnInlineCompletion: closeAction
+                )
+            } catch {
+                print("Custom action failed: \(error)")
+            }
+        }
     }
 
     private func stopProcessing() {

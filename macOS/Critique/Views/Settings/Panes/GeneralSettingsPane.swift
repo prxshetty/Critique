@@ -50,40 +50,27 @@ struct GeneralSettingsPane<SaveButton: View>: View {
                 }
 
                 // Response Window Behavior
-                GridRow {
-                    Text("Behavior:")
+                GridRow(alignment: .top) {
+                    Text("Response Style:")
                         .gridColumnAlignment(.trailing)
                         .frame(width: 110, alignment: .trailing)
                         .foregroundStyle(.secondary)
+                        .padding(.top, 2)
                     
-                    VStack(alignment: .leading, spacing: 8) {
-                        Toggle("Open custom prompts in response window", isOn: $settings.openCustomCommandsInResponseWindow)
+                    VStack(alignment: .leading, spacing: 12) {
+                        Toggle("Built-in Commands", isOn: $settings.openBuiltInCommandsInResponseView)
+                            .toggleStyle(.checkbox)
+
+                        Toggle("Custom Commands", isOn: $settings.openCustomCommandsInResponseView)
                             .toggleStyle(.checkbox)
                         
-                        Text("When unchecked, custom prompts will replace selected text inline.")
+                        Text("Show results in a window instead of replacing text directly.")
                             .font(.caption)
                             .foregroundStyle(.secondary)
                             .frame(maxWidth: 300, alignment: .leading)
                     }
                 }
                 
-                // iCloud Sync
-                GridRow {
-                    Text("Sync:")
-                        .gridColumnAlignment(.trailing)
-                        .frame(width: 110, alignment: .trailing)
-                        .foregroundStyle(.secondary)
-                    
-                    VStack(alignment: .leading, spacing: 8) {
-                        Toggle("Sync commands with iCloud", isOn: $settings.enableICloudCommandSync)
-                            .toggleStyle(.checkbox)
-                        
-                        Text("Keep your command list in sync across all your devices.")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                            .frame(maxWidth: 300, alignment: .leading)
-                    }
-                }
 
                 Divider()
                     .gridCellColumns(2)
