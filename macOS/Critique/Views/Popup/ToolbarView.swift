@@ -305,7 +305,7 @@ struct ToolbarView: View {
                 try await CommandExecutionEngine.shared.executeCustomInstruction(
                     promptToRun,
                     source: .popup,
-                    openInResponseWindow: true,
+                    openInResponseWindow: settings.openCustomCommandsInResponseView,
                     closePopupOnInlineCompletion: closeAction
                 )
             } catch {
