@@ -252,7 +252,11 @@ struct ResponseView: View {
 struct MessageBlock: View {
     let message: ChatMessage
     let fontSize: CGFloat
+    var hideCopyButton: Bool = false
     @State private var showCopied: Bool = false
+    
+    @Bindable private var settings = AppSettings.shared
+    @Environment(\.colorScheme) var colorScheme
 
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
@@ -273,16 +277,19 @@ struct MessageBlock: View {
             } else {
                 // ── Assistant output ───────────────────────────────────
                 Group {
+                    let assistantTextColor: Color = colorScheme == .dark || settings.themeStyle != .standard ? .white : .primary
+                    
                     if message.isStreaming && message.content.isEmpty {
                         EmptyView()
                     } else if message.isStreaming {
                         Text(message.content)
                             .font(.system(size: fontSize))
-                            .foregroundStyle(.primary)
+                            .foregroundStyle(assistantTextColor)
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .textSelection(.enabled)
                     } else {
                         RichMarkdownView(text: message.content, fontSize: fontSize)
+                            .foregroundStyle(assistantTextColor)
                             .fixedSize(horizontal: false, vertical: true)
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .textSelection(.enabled)
@@ -290,7 +297,7 @@ struct MessageBlock: View {
                 }
 
                 // ── Per-message copy ───────────────────────────────────
-                if !message.isStreaming && !message.content.isEmpty {
+                if !hideCopyButton && !message.isStreaming && !message.content.isEmpty {
                     HStack {
                         Spacer()
                         Button {

@@ -215,6 +215,10 @@ final class AppSettings {
         didSet { defaults.set(primaryCommandID?.uuidString, forKey: "primary_command_id") }
     }
     
+    var enterToAcceptInlineResponse: Bool {
+        didSet { defaults.set(enterToAcceptInlineResponse, forKey: "enter_to_accept_inline_response") }
+    }
+    
     // MARK: - Appearance Settings
     var commandDisplayStyle: CommandDisplayStyle {
         didSet { defaults.set(commandDisplayStyle.rawValue, forKey: "command_display_style") }
@@ -306,6 +310,8 @@ final class AppSettings {
         } else {
             self.primaryCommandID = nil
         }
+        
+        self.enterToAcceptInlineResponse = defaults.object(forKey: "enter_to_accept_inline_response") as? Bool ?? true
         
         self.commandDisplayStyle = CommandDisplayStyle(rawValue: defaults.string(forKey: "command_display_style") ?? "iconAndText") ?? .iconAndText
 

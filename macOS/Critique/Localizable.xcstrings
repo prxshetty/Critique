@@ -3708,6 +3708,9 @@
         }
       }
     },
+    "Enter to Accept" : {
+
+    },
     "Enter your prompt as plain text" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -7154,6 +7157,12 @@
     "Rename" : {
 
     },
+    "Replace" : {
+
+    },
+    "Replace selected text with the latest response" : {
+
+    },
     "Request Access" : {
 
     },
@@ -8107,9 +8116,6 @@
           }
         }
       }
-    },
-    "Show results in a window for review instead of replacing text directly." : {
-
     },
     "Standard uses system backgrounds. Glass respects transparency preferences. OLED uses deep blacks." : {
       "extractionState" : "stale",
@@ -9133,6 +9139,9 @@
           }
         }
       }
+    },
+    "When in toolbar mode, pressing Enter on an empty field will automatically replace your selected text with the AI's latest response." : {
+
     },
     "When off, custom prompts replace selected text inline." : {
       "extractionState" : "stale",

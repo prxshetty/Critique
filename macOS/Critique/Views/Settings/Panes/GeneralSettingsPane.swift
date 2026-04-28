@@ -64,7 +64,10 @@ struct GeneralSettingsPane<SaveButton: View>: View {
                         Toggle("Custom Commands", isOn: $settings.openCustomCommandsInResponseView)
                             .toggleStyle(.checkbox)
                         
-                        Text("Show results in a window instead of replacing text directly.")
+                        Toggle("Enter to Accept", isOn: $settings.enterToAcceptInlineResponse)
+                            .toggleStyle(.checkbox)
+                        
+                        Text("When in toolbar mode, pressing Enter on an empty field will automatically replace your selected text with the AI's latest response.")
                             .font(.caption)
                             .foregroundStyle(.secondary)
                             .frame(maxWidth: 300, alignment: .leading)

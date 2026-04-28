@@ -7,7 +7,7 @@ class PopupWindow: NSWindow {
   private var trackingArea: NSTrackingArea?
   private let appState: AppState
   private let windowWidth: CGFloat = 305
-
+  var inlineResponseActive: Bool = false
   private let viewModel = PopupViewModel()
   private var hasCompletedInitialLayout = false
   
@@ -76,8 +76,17 @@ class PopupWindow: NSWindow {
     WindowManager.shared.registerPopupWindow(self)
   }
 
+  private var isUpdatingWindowSize = false
+
   @objc private func updateWindowSize() {
     guard !didCleanup else { return }
+
+    // Re-entrancy guard: if called during an active layout pass (e.g., from a
+    // SwiftUI onChange during constraint update), defer to the next run loop tick
+    // to avoid the "too many constraint passes" crash.
+    guard !isUpdatingWindowSize else { return }
+    isUpdatingWindowSize = true
+    defer { isUpdatingWindowSize = false }
 
     let baseHeight: CGFloat = 100
     let buttonHeight: CGFloat = 55
@@ -94,7 +103,7 @@ class PopupWindow: NSWindow {
     let numRows = hasContent ? ceil(Double(totalCommands) / 2.0) : 0
 
     let isToolbar = AppSettings.shared.popupLayout == .toolbar && !isEditMode
-    var contentHeight: CGFloat = isToolbar ? 52 : baseHeight
+    var contentHeight: CGFloat = isToolbar ? (viewModel.inlineResponseActive ? 52 + 340 : 52) : baseHeight
 
     if !isToolbar {
       if hasContent {
@@ -115,14 +124,14 @@ class PopupWindow: NSWindow {
         context.duration = 0.25
         context.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
 
-        self.animator()
-          .setContentSize(
-            NSSize(width: self.windowWidth, height: contentHeight)
-          )
-
+        // NOTE: Do NOT call setContentSize here — setFrame already sets the size.
+        // Calling both in the same animation block causes a cascading constraint
+        // invalidation loop that crashes with "too many constraint passes".
         if let screen = self.screen {
           var frame = self.frame
+          let bottomEdge = frame.minY
           frame.size.height = contentHeight
+          frame.origin.y = bottomEdge
 
           if frame.maxY > screen.visibleFrame.maxY {
             frame.origin.y = screen.visibleFrame.maxY - frame.height
@@ -134,10 +143,11 @@ class PopupWindow: NSWindow {
         self?.setupTrackingArea()
       })
     } else {
-      setContentSize(NSSize(width: windowWidth, height: contentHeight))
       if let screen = self.screen {
         var frame = self.frame
+        let bottomEdge = frame.minY
         frame.size.height = contentHeight
+        frame.origin.y = bottomEdge
 
         if frame.maxY > screen.visibleFrame.maxY {
           frame.origin.y = screen.visibleFrame.maxY - frame.height
@@ -318,18 +328,24 @@ struct PopupWindowContentView: View {
       viewModel: viewModel,
       closeAction: closeAction
     )
-    // Use SwiftUI's native onChange to observe state changes
+    // Use SwiftUI's native onChange to observe state changes.
+    // IMPORTANT: All calls to onSizeChange() are dispatched async to break the
+    // synchronous chain. If SwiftUI's onChange fires during an active layout/constraint
+    // pass, calling setFrame synchronously causes the "too many constraint passes" crash.
     .onChange(of: appState.commandManager.commands.count) { _, _ in
-      onSizeChange()
+      DispatchQueue.main.async { onSizeChange() }
     }
     .onChange(of: viewModel.isEditMode) { _, _ in
-      onSizeChange()
+      DispatchQueue.main.async { onSizeChange() }
+    }
+    .onChange(of: viewModel.inlineResponseActive) { _, _ in
+      DispatchQueue.main.async { onSizeChange() }
     }
     .onChange(of: viewModel.showingClassicGrid) { _, _ in
-      onSizeChange()
+      DispatchQueue.main.async { onSizeChange() }
     }
     .onChange(of: AppSettings.shared.popupLayout) { _, _ in
-      onSizeChange()
+      DispatchQueue.main.async { onSizeChange() }
     }
   }
 }

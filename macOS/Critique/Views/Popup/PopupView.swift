@@ -9,6 +9,7 @@ private let logger = AppLogger.logger("PopupView")
 final class PopupViewModel {
   var isEditMode: Bool = false
   var showingClassicGrid: Bool = false
+  var inlineResponseActive: Bool = false
 }
 
 struct PopupView: View {
@@ -50,7 +51,8 @@ struct PopupView: View {
           closeAction: closeAction,
           moreAction: {
             showingCommandsView = true
-          }
+          },
+          viewModel: viewModel
         )
       } else {
         classicGridView
