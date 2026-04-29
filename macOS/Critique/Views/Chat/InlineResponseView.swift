@@ -24,6 +24,7 @@ struct InlineResponseView: View {
                     .padding(.horizontal, 16)
                     .padding(.vertical, 14)
                 }
+                .background(InjectedScrollHider())
                 .onChange(of: viewModel.messages) { old, new in
                     guard new.count > old.count else { return }
                     if reduceMotion {
@@ -38,6 +39,41 @@ struct InlineResponseView: View {
                     guard viewModel.messages.last?.isStreaming == true else { return }
                     proxy.scrollTo("bottom")
                 }
+            }
+        }
+    }
+}
+
+/// A utility that injects into the background of a ScrollView to find the 
+/// parent NSScrollView and hide its scrollbars at the AppKit level.
+struct InjectedScrollHider: NSViewRepresentable {
+    func makeNSView(context: Context) -> NSView {
+        return ScrollHiderView()
+    }
+
+    func updateNSView(_ nsView: NSView, context: Context) {}
+
+    private class ScrollHiderView: NSView {
+        override func viewDidMoveToWindow() {
+            super.viewDidMoveToWindow()
+            hideScrollers()
+        }
+
+        private func hideScrollers() {
+            var current: NSView? = self
+            while let v = current {
+                if let scrollView = v as? NSScrollView {
+                    scrollView.hasVerticalScroller = false
+                    scrollView.hasHorizontalScroller = false
+                    scrollView.verticalScroller?.alphaValue = 0
+                    scrollView.horizontalScroller?.alphaValue = 0
+                    // Sometimes SwiftUI re-enables them, so we try multiple times
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                        scrollView.hasVerticalScroller = false
+                        scrollView.hasHorizontalScroller = false
+                    }
+                }
+                current = v.superview
             }
         }
     }

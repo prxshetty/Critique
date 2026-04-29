@@ -53,6 +53,7 @@ class PopupWindow: NSWindow {
     )
 
     let hostingView = FirstResponderHostingView(rootView: contentView)
+    hostingView.layer?.backgroundColor = .clear
     hostingView.wantsLayer = true
     hostingView.layer?.cornerRadius = 20
     hostingView.layer?.maskedCorners = [
@@ -103,7 +104,8 @@ class PopupWindow: NSWindow {
     let numRows = hasContent ? ceil(Double(totalCommands) / 2.0) : 0
 
     let isToolbar = AppSettings.shared.popupLayout == .toolbar && !isEditMode
-    var contentHeight: CGFloat = isToolbar ? (viewModel.inlineResponseActive ? 52 + 340 : 52) : baseHeight
+    let pillHeight = DesignSystem.pillHeight
+    var contentHeight: CGFloat = isToolbar ? (viewModel.inlineResponseActive ? pillHeight + 301 : pillHeight) : baseHeight
 
     if !isToolbar {
       if hasContent {
