@@ -251,6 +251,12 @@ final class CommandExecutionEngine {
     appState.selectedImages = capture.images
     appState.selectedAttributedText = capture.attributedText
     appState.selectedText = capture.text
+    
+    if let attrText = capture.attributedText {
+        appState.captureSelectionAttributes(from: attrText)
+    } else {
+        appState.capturedSelectionAttributes = nil
+    }
 
     if let previousApp {
       appState.previousApplication = previousApp

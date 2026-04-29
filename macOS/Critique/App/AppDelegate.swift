@@ -234,6 +234,12 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
             self.appState.selectedText = capture.text
             self.appState.selectedImages = capture.images
 
+            if let attrText = capture.attributedText {
+                self.appState.captureSelectionAttributes(from: attrText)
+            } else {
+                self.appState.capturedSelectionAttributes = nil
+            }
+
             
             let window = PopupWindow(appState: self.appState)
             NSApp.activate()

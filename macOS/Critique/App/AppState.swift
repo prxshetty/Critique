@@ -60,6 +60,7 @@ final class AppState {
     private(set) var currentProvider: String
 
     var selectedAttributedText: NSAttributedString? = nil
+    var capturedSelectionAttributes: [NSAttributedString.Key: Any]? = nil
 
     var activeProvider: any AIProvider {
         switch currentProvider {
@@ -673,6 +674,16 @@ final class AppState {
         }
     }
 
+    func captureSelectionAttributes(from attributedText: NSAttributedString) {
+        guard attributedText.length > 0 else {
+            capturedSelectionAttributes = nil
+            return
+        }
+        // Sample from midpoint for best representation
+        let mid = attributedText.length / 2
+        capturedSelectionAttributes = attributedText.attributes(at: mid, effectiveRange: nil)
+    }
+
     func replaceSelectedTextPreservingAttributes(with corrected: String) {
         guard let original = selectedAttributedText else {
             replaceSelectedText(with: corrected)
@@ -689,7 +700,11 @@ final class AppState {
         let clipboardSnapshot = NSPasteboard.general.createSnapshot()
 
         let mutable = NSMutableAttributedString(attributedString: original)
-        let didApplyDiff = mutable.applyCharacterDiff(from: original.string, to: corrected)
+        let didApplyDiff = mutable.applyCharacterDiff(
+            from: original.string,
+            to: corrected,
+            preferredAttributes: capturedSelectionAttributes
+        )
         if !didApplyDiff {
             logger.warning("Failed to apply UTF-16-safe diff; falling back to plain-text replacement")
             replaceSelectedText(with: corrected)
@@ -830,7 +845,11 @@ extension NSMutableAttributedString {
     /// Transforms *self* so that `self.string == new`, preserving
     /// attributes around the changed span wherever possible.
     @discardableResult
-    func applyCharacterDiff(from old: String, to new: String) -> Bool {
+    func applyCharacterDiff(
+        from old: String,
+        to new: String,
+        preferredAttributes: [NSAttributedString.Key: Any]? = nil
+    ) -> Bool {
         guard old == self.string else {
             logger.error("applyCharacterDiff precondition failed: receiver content does not match source text")
             return false
@@ -876,7 +895,11 @@ extension NSMutableAttributedString {
 
         let replacementText = String(newChars[prefix..<newSuffix])
         let replacementAttributes: [NSAttributedString.Key: Any]
-        if location > 0 && location - 1 < self.length {
+        
+        if let preferred = preferredAttributes, !preferred.isEmpty {
+            // Use the snapshot captured at hotkey time for maximum reliability
+            replacementAttributes = preferred
+        } else if location > 0 && location - 1 < self.length {
             replacementAttributes = attributes(at: location - 1, effectiveRange: nil)
         } else if location < self.length {
             replacementAttributes = attributes(at: location, effectiveRange: nil)
