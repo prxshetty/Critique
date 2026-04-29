@@ -191,6 +191,10 @@ final class AppSettings {
     var openCustomCommandsInResponseView: Bool {
         didSet { defaults.set(openCustomCommandsInResponseView, forKey: "open_custom_commands_in_response_view") }
     }
+
+    var openManualInstructionsInResponseView: Bool {
+        didSet { defaults.set(openManualInstructionsInResponseView, forKey: "open_manual_instructions_in_response_view") }
+    }
     
     var wantsScreenshotOCR: Bool {
         didSet { defaults.set(wantsScreenshotOCR, forKey: "wants_screenshot_ocr") }
@@ -296,6 +300,7 @@ final class AppSettings {
         }
         self.openBuiltInCommandsInResponseView = defaults.object(forKey: "open_built_in_commands_in_response_view") as? Bool ?? false
         self.openCustomCommandsInResponseView = defaults.object(forKey: "open_custom_commands_in_response_view") as? Bool ?? false
+        self.openManualInstructionsInResponseView = defaults.object(forKey: "open_manual_instructions_in_response_view") as? Bool ?? false
         
         self.wantsScreenshotOCR = defaults.bool(forKey: "wants_screenshot_ocr")
 

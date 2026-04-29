@@ -387,7 +387,6 @@ struct ToolbarView: View {
                 }
             }
         )
-        .padding(.horizontal, 2)
         .onChange(of: inlineResponseViewModel != nil) { _, active in
             viewModel.inlineResponseActive = active
         }
@@ -418,16 +417,31 @@ struct ToolbarView: View {
                 ? promptToRun
                 : "User's instruction: \(promptToRun) \n\nText:\n\(selectedText)"
 
-            withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
-                self.inlineResponseViewModel = ResponseViewModel(
-                    selectedText: selectedText,
-                    option: nil,
-                    provider: appState.activeProvider,
-                    systemPrompt: systemPrompt,
-                    userPrompt: userPrompt,
-                    images: appState.selectedImages,
-                    continuationSystemPrompt: systemPrompt
-                )
+            if settings.openManualInstructionsInResponseView {
+                withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                    self.inlineResponseViewModel = ResponseViewModel(
+                        selectedText: selectedText,
+                        option: nil,
+                        provider: appState.activeProvider,
+                        systemPrompt: systemPrompt,
+                        userPrompt: userPrompt,
+                        images: appState.selectedImages,
+                        continuationSystemPrompt: systemPrompt
+                    )
+                }
+            } else {
+                // Direct replacement path for custom instructions
+                do {
+                    let text = try await appState.activeProvider.processText(
+                        systemPrompt: systemPrompt,
+                        userPrompt: userPrompt,
+                        images: appState.selectedImages,
+                        streaming: false
+                    )
+                    appState.replaceSelectedText(with: text)
+                } catch {
+                    print("Custom action failed: \(error)")
+                }
             }
         }
     }
@@ -472,16 +486,35 @@ struct ToolbarView: View {
                 let input = try await appState.resolveCommandInput(mode: .textOrImagesWithOCRFallback)
                 let provider = appState.getProvider(for: command)
 
-                withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
-                    self.inlineResponseViewModel = ResponseViewModel(
-                        selectedText: appState.selectedText,
-                        option: nil,
-                        provider: provider,
+                // Determine if we should show in window or replace directly
+                let shouldShowInWindow = command.useResponseWindow || 
+                                       (command.isBuiltIn ? settings.openBuiltInCommandsInResponseView : settings.openCustomCommandsInResponseView)
+
+                if shouldShowInWindow {
+                    withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                        self.inlineResponseViewModel = ResponseViewModel(
+                            selectedText: appState.selectedText,
+                            option: nil,
+                            provider: provider,
+                            systemPrompt: command.prompt,
+                            userPrompt: input.userPrompt,
+                            images: input.images,
+                            continuationSystemPrompt: command.prompt
+                        )
+                    }
+                } else {
+                    // Direct replacement path
+                    let text = try await provider.processText(
                         systemPrompt: command.prompt,
                         userPrompt: input.userPrompt,
                         images: input.images,
-                        continuationSystemPrompt: command.prompt
+                        streaming: false
                     )
+                    
+                    appState.replaceSelectedText(with: text)
+                    
+                    // Reset selection after direct replacement
+                    self.selectedCommandID = nil
                 }
             } catch is CancellationError {
                 // Ignore cancellation - user clicked stop
