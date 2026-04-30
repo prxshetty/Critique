@@ -244,15 +244,13 @@ struct ToolbarView: View {
                     .help("Replace selected text with the latest response")
                 } else {
                     Menu {
-                        Section("Tone") {
-                            ForEach(sortedCommands) { command in
-                                Button {
-                                    updateSelection(to: command)
-                                } label: {
-                                    Label(command.name, systemImage: command.icon)
-                                    if command.id == selectedCommand?.id {
-                                        Image(systemName: "checkmark")
-                                    }
+                        ForEach(sortedCommands) { command in
+                            Button {
+                                updateSelection(to: command)
+                            } label: {
+                                Label(command.name, systemImage: command.icon)
+                                if command.id == selectedCommand?.id {
+                                    Image(systemName: "checkmark")
                                 }
                             }
                         }
