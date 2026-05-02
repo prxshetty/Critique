@@ -84,6 +84,7 @@ final class CommandExecutionEngine {
     let shouldUseResponseWindow = command.useResponseWindow 
         || (command.isBuiltIn && settings.openBuiltInCommandsInResponseView)
         || (!command.isBuiltIn && settings.openCustomCommandsInResponseView)
+        || settings.useMultiIteration
         || input.source == .imageOCRFallback
 
     if shouldUseResponseWindow {

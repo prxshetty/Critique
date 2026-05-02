@@ -138,6 +138,27 @@ struct ResponseView: View {
                             .foregroundStyle(.tertiary)
                     }
                     .transition(.opacity.combined(with: .scale(scale: 0.9)))
+                } else if settings.useMultiIteration && viewModel.iterations.count > 0 {
+                    // Iteration Switcher for ResponseView
+                    HStack(spacing: 8) {
+                        ForEach(0..<3, id: \.self) { index in
+                            let isSelected = index == viewModel.selectedIterationIndex
+                            let isGenerated = index < viewModel.iterations.count
+                            
+                            Circle()
+                                .fill(isSelected ? Color.blue : Color.secondary.opacity(isGenerated ? 1.0 : 0.3))
+                                .frame(width: 7, height: 7)
+                                .shimmer(isActive: !isGenerated && viewModel.isProcessing)
+                                .onTapGesture {
+                                    if isGenerated {
+                                        withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                                            viewModel.selectIteration(index: index)
+                                        }
+                                    }
+                                }
+                        }
+                    }
+                    .padding(.horizontal, 10)
                 }
 
                 // Font size controls — compact and unobtrusive

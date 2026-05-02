@@ -8,11 +8,16 @@ final class ResponseViewModel {
     var messages: [ChatMessage] = []
     var fontSize: CGFloat = 13 // Default font size
     var isProcessing: Bool = false
-    var showCopyConfirmation: Bool = false
+    var showCopyConfirmation: Bool = false    
+    var iterations: [String] = []
+    var selectedIterationIndex: Int = 0
     
     private let selectedText: String
     private let option: WritingOption?
     private let provider: any AIProvider
+    let systemPrompt: String
+    let userPrompt: String
+    let images: [Data]
     private let continuationSystemPrompt: String?
     
     private var currentTask: Task<Void, Never>?
@@ -28,6 +33,9 @@ final class ResponseViewModel {
         self.selectedText = selectedText
         self.option = option
         self.provider = provider
+        self.systemPrompt = ""
+        self.userPrompt = ""
+        self.images = []
         self.continuationSystemPrompt = continuationSystemPrompt
         
         // Add the initial message
@@ -47,6 +55,9 @@ final class ResponseViewModel {
         self.selectedText = selectedText
         self.option = option
         self.provider = provider
+        self.systemPrompt = systemPrompt
+        self.userPrompt = userPrompt
+        self.images = images
         self.continuationSystemPrompt = continuationSystemPrompt
         
         // Start processing immediately
@@ -60,30 +71,76 @@ final class ResponseViewModel {
     private func startInitialRequest(systemPrompt: String, userPrompt: String, images: [Data]) {
         isProcessing = true
         
-        // Add an empty streaming message
-        let streamingMessage = ChatMessage(role: "assistant", content: "", isStreaming: true)
-        messages.append(streamingMessage)
-        
+        // Use a single placeholder for both paths
+        let placeholder = ChatMessage(role: "assistant", content: "", isStreaming: true)
+        messages.append(placeholder)
+
+        let settings = AppSettings.shared
         currentTask = Task {
             do {
-                try await provider.processTextStreaming(
-                    systemPrompt: systemPrompt,
-                    userPrompt: userPrompt,
-                    images: images,
-                    onChunk: { [weak self] chunk in
-                        guard let self = self, !Task.isCancelled else { return }
-                        if let index = self.messages.firstIndex(where: { $0.id == streamingMessage.id }) {
-                            self.messages[index].content += chunk
+                if settings.useMultiIteration {
+                    try await withThrowingTaskGroup(of: String.self) { group in
+                        for _ in 0..<3 {
+                            group.addTask {
+                                try await self.provider.processText(
+                                    systemPrompt: systemPrompt,
+                                    userPrompt: userPrompt,
+                                    images: images,
+                                    streaming: false
+                                )
+                            }
+                        }
+                        
+                        for try await result in group {
+                            self.iterations.append(result)
+                            
+                            // Show the first one immediately as it arrives
+                            if self.iterations.count == 1 {
+                                if let index = self.messages.firstIndex(where: { $0.id == placeholder.id }) {
+                                    self.messages[index].content = result
+                                    self.messages[index].isStreaming = false
+                                    self.selectedIterationIndex = 0
+                                }
+                            }
                         }
                     }
-                )
-                
-                // Finalize streaming
-                if let index = self.messages.firstIndex(where: { $0.id == streamingMessage.id }) {
-                    self.messages[index].isStreaming = false
+                } else if settings.useStreamingResponse {
+                    try await provider.processTextStreaming(
+                        systemPrompt: systemPrompt,
+                        userPrompt: userPrompt,
+                        images: images,
+                        onChunk: { [weak self] chunk in
+                            guard let self = self, !Task.isCancelled else { return }
+                            if let index = self.messages.firstIndex(where: { $0.id == placeholder.id }) {
+                                self.messages[index].content += chunk
+                            }
+                        }
+                    )
+                    
+                    if let index = self.messages.firstIndex(where: { $0.id == placeholder.id }) {
+                        self.messages[index].isStreaming = false
+                        let content = self.messages[index].content
+                        if !content.isEmpty {
+                            self.iterations = [content]
+                        }
+                    }
+                } else {
+                    let result = try await provider.processText(
+                        systemPrompt: systemPrompt,
+                        userPrompt: userPrompt,
+                        images: images,
+                        streaming: false
+                    )
+                    
+                    if let index = self.messages.firstIndex(where: { $0.id == placeholder.id }) {
+                        self.messages[index].content = result
+                        self.messages[index].isStreaming = false
+                        self.iterations = [result]
+                        self.selectedIterationIndex = 0
+                    }
                 }
             } catch {
-                if let index = self.messages.firstIndex(where: { $0.id == streamingMessage.id }) {
+                if let index = self.messages.firstIndex(where: { $0.id == placeholder.id }) {
                     self.messages[index].content += "\n\nError: \(error.localizedDescription)"
                     self.messages[index].isStreaming = false
                 }
@@ -176,5 +233,15 @@ final class ResponseViewModel {
         currentTask?.cancel()
         provider.cancel()
         isProcessing = false
+    }
+
+    func selectIteration(index: Int) {
+        guard iterations.indices.contains(index) else { return }
+        selectedIterationIndex = index
+        
+        let content = iterations[index]
+        if let msgIndex = messages.lastIndex(where: { $0.role == "assistant" }) {
+            messages[msgIndex].content = content
+        }
     }
 }
