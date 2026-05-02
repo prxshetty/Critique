@@ -58,13 +58,13 @@ struct GeneralSettingsPane<SaveButton: View>: View {
                         .foregroundStyle(.secondary)
                     
                     VStack(alignment: .leading, spacing: 8) {
-                        Button("Restart Onboarding...") {
+                        Button("Restart Onboarding") {
                             settings.hasCompletedOnboarding = false
                             NSApplication.shared.terminate(nil)
                         }
                         .buttonStyle(.bordered)
                         
-                        Text("This will reset your setup progress and close the app so you can see the welcome screen on next launch.")
+                        Text("Resets setup progress and closes Critique so you can see the Onboarding screen.")
                             .font(.caption)
                             .foregroundStyle(.secondary)
                             .frame(maxWidth: 300, alignment: .leading)

@@ -62,18 +62,18 @@ struct SettingsView: View {
                     Button {
                         selectedTab = tab
                     } label: {
-                        VStack(spacing: 4) {
+                        VStack(spacing: 2) {
                             Image(systemName: tab.systemImage)
-                                .font(.system(size: 24))
+                                .font(.system(size: 20))
                                 .foregroundStyle(selectedTab == tab ? .blue : .secondary)
-                                .frame(width: 32, height: 32)
+                                .frame(width: 28, height: 28)
                             
                             Text(tab.rawValue)
-                                .font(.system(size: 11))
+                                .font(.system(size: 10))
                                 .foregroundStyle(selectedTab == tab ? .blue : .primary)
                         }
                         .frame(width: 70)
-                        .padding(.vertical, 10)
+                        .padding(.vertical, 6)
                         .padding(.horizontal, 4)
                         .contentShape(Rectangle())
                     }
@@ -81,17 +81,12 @@ struct SettingsView: View {
                 }
                 Spacer()
             }
-            .padding(.top, 24)
-            .background(Color.black.opacity(0.03))
+            .padding(.top, 8)
             
             Divider()
             
             // Pane Content Area
             ZStack {
-                // Background
-                VisualEffectView(material: .windowBackground, state: .active)
-                    .ignoresSafeArea()
-
                 Group {
                     switch selectedTab {
                     case .general:
@@ -135,9 +130,10 @@ struct SettingsView: View {
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
             }
-            // Removed manual Done bottom bar here
         }
         .frame(minWidth: 540, idealWidth: 600, maxWidth: 800, minHeight: 500, idealHeight: 600, maxHeight: 900)
+        .background(VisualEffectView(material: .windowBackground, state: .active))
+        .background(Color.primary.opacity(0.03))
         .background(WindowAccessor { window in
             hostingWindow = window
             updateWindowTitle(to: selectedTab)

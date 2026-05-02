@@ -231,6 +231,7 @@
 
     },
     "A command with this name already exists. Please choose a different name." : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -473,6 +474,7 @@
       }
     },
     "Add one to get started" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -521,6 +523,9 @@
       }
     },
     "Advanced:" : {
+
+    },
+    "AI Engine" : {
 
     },
     "AI Provider" : {
@@ -639,6 +644,9 @@
           }
         }
       }
+    },
+    "Allows you to press Enter to instantly replace the selected text with the AI response." : {
+
     },
     "Allows you to run OCR on screenshot snippets. Requires Screen Recording permission." : {
 
@@ -852,10 +860,8 @@
         }
       }
     },
-    "Apply" : {
-
-    },
     "Apply %@ to selected text" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -881,6 +887,7 @@
 
     },
     "Are you sure you want to delete \"%@\"? This action cannot be undone." : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1574,6 +1581,7 @@
       }
     },
     "Close" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1619,6 +1627,7 @@
       }
     },
     "Close editor" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1730,6 +1739,7 @@
       }
     },
     "Command Type" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2386,6 +2396,7 @@
       }
     },
     "Custom Commands" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2624,6 +2635,7 @@
       }
     },
     "Delete %@" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2646,6 +2658,7 @@
       }
     },
     "Delete command" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2668,6 +2681,7 @@
       }
     },
     "Delete Command" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2784,6 +2798,7 @@
       }
     },
     "Discard changes and close" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -3018,6 +3033,7 @@
 
     },
     "Duplicate Command Name" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -3226,6 +3242,7 @@
       }
     },
     "e.g., gpt-4o-mini, claude-3-5-sonnet" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -3277,6 +3294,7 @@
 
     },
     "e.g., https://api.example.com/v1" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -3392,6 +3410,7 @@
       }
     },
     "Edit %@" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -3414,6 +3433,7 @@
       }
     },
     "Edit Built-In Command" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -3436,6 +3456,7 @@
       }
     },
     "Edit command" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -3458,6 +3479,7 @@
       }
     },
     "Edit Command" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -3552,6 +3574,7 @@
 
     },
     "Edit this command's details" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -3708,7 +3731,7 @@
         }
       }
     },
-    "Enter to Accept" : {
+    "Enter to Accept Response" : {
 
     },
     "Enter your prompt as plain text" : {
@@ -3825,6 +3848,7 @@
       }
     },
     "Exit Edit Mode" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -4125,6 +4149,7 @@
       }
     },
     "General" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -4169,6 +4194,9 @@
         }
       }
     },
+    "Generates three variations in parallel. This will always open a window so you can choose the best output." : {
+
+    },
     "Generating..." : {
       "extractionState" : "stale",
       "localizations" : {
@@ -4191,6 +4219,9 @@
           }
         }
       }
+    },
+    "Generation:" : {
+
     },
     "Get Anthropic API Key" : {
       "localizations" : {
@@ -4448,6 +4479,7 @@
 
     },
     "Icon" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -4639,7 +4671,7 @@
         }
       }
     },
-    "Interface style" : {
+    "Interactions:" : {
 
     },
     "Keep Alive" : {
@@ -4740,6 +4772,9 @@
         }
       }
     },
+    "Keyboard" : {
+
+    },
     "Keyboard Shortcuts" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -4789,13 +4824,7 @@
     "Language Preservation:" : {
 
     },
-    "Layout:" : {
-
-    },
     "Leave empty to use the default model for the provider." : {
-
-    },
-    "Leave empty to use the default model for the selected provider." : {
 
     },
     "Leave empty to use the default model for the selected provider. Examples: gpt-5-mini (OpenAI), claude-sonnet-4-5 (Anthropic), gemini-flash-latest (Gemini)" : {
@@ -5193,6 +5222,7 @@
       }
     },
     "Manage Commands" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -5239,6 +5269,9 @@
           }
         }
       }
+    },
+    "Manual Input (Ask Critique)" : {
+
     },
     "Markdown" : {
 
@@ -5501,7 +5534,11 @@
         }
       }
     },
+    "My Custom Commands" : {
+
+    },
     "Name" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -5571,6 +5608,7 @@
       }
     },
     "No built-in commands" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -5593,6 +5631,7 @@
       }
     },
     "No custom commands yet" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -5959,6 +5998,7 @@
       }
     },
     "Open editor for this command" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -6001,6 +6041,9 @@
           }
         }
       }
+    },
+    "Open in Window:" : {
+
     },
     "Open Mistral console to create an API key." : {
       "localizations" : {
@@ -6346,10 +6389,14 @@
         }
       }
     },
+    "Opens the AI's response in a new window instead of replacing your selected text directly." : {
+
+    },
     "Optional" : {
 
     },
     "Options" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -6421,6 +6468,7 @@
 
     },
     "Override the default AI provider for this specific command" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -6823,9 +6871,6 @@
         }
       }
     },
-    "Prompt" : {
-
-    },
     "Prompt Configuration" : {
 
     },
@@ -7111,6 +7156,7 @@
       }
     },
     "Remove this command" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -7133,6 +7179,7 @@
       }
     },
     "Removes this command" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -7237,6 +7284,7 @@
       }
     },
     "Reset all built-in commands to their original state, including restoring any that were deleted" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -7373,6 +7421,7 @@
       }
     },
     "Reset to Defaults" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -7394,7 +7443,10 @@
         }
       }
     },
-    "Response Style:" : {
+    "Resets setup progress and closes Critique so you can see the Onboarding screen." : {
+
+    },
+    "Response Style" : {
 
     },
     "Restart onboarding" : {
@@ -7421,7 +7473,6 @@
       }
     },
     "Restart Onboarding" : {
-      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -7442,9 +7493,6 @@
           }
         }
       }
-    },
-    "Restart Onboarding..." : {
-
     },
     "Resume Hotkeys" : {
       "localizations" : {
@@ -8094,6 +8142,9 @@
         }
       }
     },
+    "Show multiple iterations (Max 3)" : {
+
+    },
     "Show Preview" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -8196,6 +8247,9 @@
       }
     },
     "Step %lld of 3" : {
+
+    },
+    "Stream responses" : {
 
     },
     "Style" : {
@@ -8369,6 +8423,7 @@
       }
     },
     "The base URL of your API endpoint (e.g., https://api.openai.com/v1)" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -8414,6 +8469,7 @@
       }
     },
     "The model identifier to use" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -8513,6 +8569,7 @@
 
     },
     "This is a built-in command. Your changes will be saved but you can reset to the original configuration later if needed." : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -8585,10 +8642,8 @@
         }
       }
     },
-    "This will reset your setup progress and close the app so you can see the welcome screen on next launch." : {
-
-    },
     "Tip: This shortcut will execute the command directly without opening the popup window." : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -8763,6 +8818,7 @@
 
     },
     "Use custom AI provider for this command" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -9140,9 +9196,6 @@
         }
       }
     },
-    "When in toolbar mode, pressing Enter on an empty field will automatically replace your selected text with the AI's latest response." : {
-
-    },
     "When off, custom prompts replace selected text inline." : {
       "extractionState" : "stale",
       "localizations" : {
@@ -9380,6 +9433,7 @@
       }
     },
     "Your API authentication key" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {

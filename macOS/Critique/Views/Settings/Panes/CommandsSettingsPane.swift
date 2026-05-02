@@ -81,14 +81,12 @@ struct CommandsSettingsPane<SaveButton: View>: View {
                     .padding(.horizontal, 12)
                     .padding(.vertical, 8)
                 }
-                .background(Color.primary.opacity(0.02))
                 .frame(width: 180)
                 
                 Divider()
                 
                 // Right Detail
                 ZStack {
-                    Color.primary.opacity(0.01) // slight emphasis on the editor side
                     if let id = selectedCommandID, let binding = binding(for: id) {
                         InlineCommandEditor(command: binding, commandManager: appState.commandManager)
                     } else {
