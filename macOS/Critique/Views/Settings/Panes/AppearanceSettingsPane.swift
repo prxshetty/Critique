@@ -44,28 +44,6 @@ struct AppearanceSettingsPane<SaveButton: View>: View {
                 
                 GridRow {
                     VStack(alignment: .trailing, spacing: 2) {
-                        Text("Layout:")
-                            .foregroundStyle(.secondary)
-                        Text("Interface style")
-                            .font(.caption2)
-                            .foregroundStyle(.tertiary)
-                    }
-                    .gridColumnAlignment(.trailing)
-                    .frame(width: 110, alignment: .trailing)
-                    
-                    Picker("", selection: $settings.popupLayout) {
-                        ForEach(PopupLayout.allCases) { layout in
-                            Text(layout.localizedName).tag(layout)
-                        }
-                    }
-                    .frame(width: 180, alignment: .leading)
-                    .onChange(of: settings.popupLayout) { _, _ in
-                        needsSaving = true
-                    }
-                }
-                
-                GridRow {
-                    VStack(alignment: .trailing, spacing: 2) {
                         Text("Button Style:")
                             .foregroundStyle(.secondary)
                         Text("Icon/Text")
@@ -86,27 +64,24 @@ struct AppearanceSettingsPane<SaveButton: View>: View {
                     }
                 }
                 
-                if settings.popupLayout == .toolbar {
-                    GridRow {
-                        VStack(alignment: .trailing, spacing: 2) {
-                            Text("Default Tone:")
-                                .foregroundStyle(.secondary)
-                            Text("Initial style")
-                                .font(.caption2)
-                                .foregroundStyle(.tertiary)
+                GridRow {
+                    VStack(alignment: .trailing, spacing: 2) {
+                        Text("Default Tone:")
+                        Text("Initial style")
+                            .font(.caption2)
+                            .foregroundStyle(.tertiary)
+                    }
+                    .gridColumnAlignment(.trailing)
+                    .frame(width: 110, alignment: .trailing)
+                    
+                    Picker("", selection: $settings.primaryTone) {
+                        ForEach(WritingOption.allCases) { tone in
+                            Text(tone.localizedName).tag(tone)
                         }
-                        .gridColumnAlignment(.trailing)
-                        .frame(width: 110, alignment: .trailing)
-                        
-                        Picker("", selection: $settings.primaryTone) {
-                            ForEach(WritingOption.allCases) { tone in
-                                Text(tone.localizedName).tag(tone)
-                            }
-                        }
-                        .frame(width: 180, alignment: .leading)
-                        .onChange(of: settings.primaryTone) { _, _ in
-                            needsSaving = true
-                        }
+                    }
+                    .frame(width: 180, alignment: .leading)
+                    .onChange(of: settings.primaryTone) { _, _ in
+                        needsSaving = true
                     }
                 }
 

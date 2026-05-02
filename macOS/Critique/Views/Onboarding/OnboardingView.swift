@@ -47,9 +47,8 @@ import ApplicationServices
               
             // Live Sandbox for the Popup
             OnboardingMockupView(isSuccess: false) {
-                PopupView(
+                ToolbarView(
                   appState: appState,
-                  viewModel: PopupViewModel(),
                   closeAction: {}
                 )
                 .frame(width: 380, height: 180)

@@ -6,18 +6,7 @@ extension Notification.Name {
     static let apiKeyDidChange = Notification.Name("apiKeyDidChange")
 }
 
-enum PopupLayout: String, CaseIterable, Identifiable {
-    case grid = "grid"
-    case toolbar = "toolbar"
-    var id: String { rawValue }
-    
-    var localizedName: String {
-        switch self {
-        case .grid: return "Vertical Grid"
-        case .toolbar: return "Horizontal Toolbar"
-        }
-    }
-}
+
 
 enum CommandDisplayStyle: String, CaseIterable, Identifiable {
     case iconAndText = "iconAndText"
@@ -211,9 +200,7 @@ final class AppSettings {
         }
     }
     
-    var popupLayout: PopupLayout {
-        didSet { defaults.set(popupLayout.rawValue, forKey: "popup_layout") }
-    }
+
     
     var primaryCommandID: UUID? {
         didSet { defaults.set(primaryCommandID?.uuidString, forKey: "primary_command_id") }
@@ -222,6 +209,16 @@ final class AppSettings {
     var enterToAcceptInlineResponse: Bool {
         didSet { defaults.set(enterToAcceptInlineResponse, forKey: "enter_to_accept_inline_response") }
     }
+
+    var useStreamingResponse: Bool {
+        didSet { defaults.set(useStreamingResponse, forKey: "use_streaming_response")}
+    }
+
+    var useMultiIteration: Bool {
+        didSet { defaults.set(useMultiIteration, forKey: "use_multi_iteration")}
+    }
+    
+    var isInlineResponseActive: Bool = false
     
     // MARK: - Appearance Settings
     var commandDisplayStyle: CommandDisplayStyle {
@@ -309,7 +306,7 @@ final class AppSettings {
         // Cloud command sync setting defaults to false until explicitly enabled.
         self.enableICloudCommandSync = defaults.object(forKey: "enable_icloud_command_sync") as? Bool ?? false
 
-        self.popupLayout = PopupLayout(rawValue: defaults.string(forKey: "popup_layout") ?? "toolbar") ?? .toolbar
+
         if let idString = defaults.string(forKey: "primary_command_id"), let uuid = UUID(uuidString: idString) {
             self.primaryCommandID = uuid
         } else {
@@ -318,6 +315,8 @@ final class AppSettings {
         
         self.enterToAcceptInlineResponse = defaults.object(forKey: "enter_to_accept_inline_response") as? Bool ?? true
         
+        self.useStreamingResponse = defaults.bool(forKey: "use_streaming_response") // default is false
+        self.useMultiIteration = defaults.bool(forKey: "use_multi_iteration") // default is false
         self.commandDisplayStyle = CommandDisplayStyle(rawValue: defaults.string(forKey: "command_display_style") ?? "iconAndText") ?? .iconAndText
 
         isBootstrapping = false

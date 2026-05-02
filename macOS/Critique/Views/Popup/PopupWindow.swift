@@ -8,7 +8,6 @@ class PopupWindow: NSWindow {
   private let appState: AppState
   private let windowWidth: CGFloat = 305
   var inlineResponseActive: Bool = false
-  private let viewModel = PopupViewModel()
   private var hasCompletedInitialLayout = false
   
   init(appState: AppState) {
@@ -45,7 +44,6 @@ class PopupWindow: NSWindow {
     // Use a wrapper view that observes changes and triggers window size updates
     let contentView = PopupWindowContentView(
       appState: appState,
-      viewModel: viewModel,
       closeAction: closeAction,
       onSizeChange: { [weak self] in
         self?.updateWindowSize()
@@ -89,31 +87,13 @@ class PopupWindow: NSWindow {
     isUpdatingWindowSize = true
     defer { isUpdatingWindowSize = false }
 
-    let baseHeight: CGFloat = 100
-    let buttonHeight: CGFloat = 55
-    let spacing: CGFloat = 10
-    let editButtonHeight: CGFloat = 60
-
-    // Snapshot values at the start to avoid reading changing state mid-calculation
-    let commands = appState.commandManager.commands
-    let totalCommands = commands.count
-    let hasContent =
-      !appState.selectedText.isEmpty
-      || !appState.selectedImages.isEmpty
-    let isEditMode = viewModel.isEditMode
-    let numRows = hasContent ? ceil(Double(totalCommands) / 2.0) : 0
-
-    let isToolbar = AppSettings.shared.popupLayout == .toolbar && !isEditMode
     let pillHeight = DesignSystem.pillHeight
-    var contentHeight: CGFloat = isToolbar ? (viewModel.inlineResponseActive ? pillHeight + 301 : pillHeight) : baseHeight
-
-    if !isToolbar {
-      if hasContent {
-        contentHeight += (buttonHeight * CGFloat(numRows)) + spacing
-        if isEditMode {
-          contentHeight += editButtonHeight
-        }
-      }
+    
+    var contentHeight: CGFloat
+    if AppSettings.shared.isInlineResponseActive {
+      contentHeight = pillHeight + 301 // Full height for all response views
+    } else {
+      contentHeight = pillHeight
     }
 
     guard contentView != nil else { return }
@@ -320,14 +300,12 @@ class FirstResponderHostingView<Content: View>: NSHostingView<Content> {
 /// observation loops with cleaner SwiftUI patterns.
 struct PopupWindowContentView: View {
   @Bindable var appState: AppState
-  @Bindable var viewModel: PopupViewModel
   let closeAction: () -> Void
   let onSizeChange: () -> Void
   
   var body: some View {
-    PopupView(
+    ToolbarView(
       appState: appState,
-      viewModel: viewModel,
       closeAction: closeAction
     )
     // Use SwiftUI's native onChange to observe state changes.
@@ -337,16 +315,7 @@ struct PopupWindowContentView: View {
     .onChange(of: appState.commandManager.commands.count) { _, _ in
       DispatchQueue.main.async { onSizeChange() }
     }
-    .onChange(of: viewModel.isEditMode) { _, _ in
-      DispatchQueue.main.async { onSizeChange() }
-    }
-    .onChange(of: viewModel.inlineResponseActive) { _, _ in
-      DispatchQueue.main.async { onSizeChange() }
-    }
-    .onChange(of: viewModel.showingClassicGrid) { _, _ in
-      DispatchQueue.main.async { onSizeChange() }
-    }
-    .onChange(of: AppSettings.shared.popupLayout) { _, _ in
+    .onChange(of: AppSettings.shared.isInlineResponseActive) { _, _ in
       DispatchQueue.main.async { onSizeChange() }
     }
   }

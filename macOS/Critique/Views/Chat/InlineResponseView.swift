@@ -2,7 +2,6 @@ import SwiftUI
 
 struct InlineResponseView: View {
     @Bindable var viewModel: ResponseViewModel
-    @Bindable var popupViewModel: PopupViewModel
     let closeAction: () -> Void
 
     @Environment(\.accessibilityReduceMotion) var reduceMotion
@@ -34,11 +33,9 @@ struct InlineResponseView: View {
                     .background(InjectedScrollHider())
                     
                     if !viewModel.isProcessing || AppSettings.shared.useMultiIteration {
-                        if AppSettings.shared.useMultiIteration || popupViewModel.isResponseExpanded {
-                            bottomToolbar
-                                .padding(.horizontal, 16)
-                                .padding(.vertical, 4)
-                        }
+                        bottomToolbar
+                            .padding(.horizontal, 16)
+                            .padding(.vertical, 4)
                     }
                 }
                 .onChange(of: viewModel.messages) { old, new in

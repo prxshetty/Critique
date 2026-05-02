@@ -15,8 +15,6 @@ struct ToolbarView: View {
     @Environment(\.colorScheme) private var colorScheme
 
     let closeAction: () -> Void
-    let moreAction: () -> Void
-    let viewModel: PopupViewModel
 
     private var themeTokens: DesignSystem.ThemeTokens {
         DesignSystem.tokens(for: settings.themeStyle)
@@ -127,10 +125,14 @@ struct ToolbarView: View {
             : NSColor.labelColor
     }
 
+    // Error handling
+    @State private var showingErrorAlert = false
+    @State private var errorMessage = ""
+
     var body: some View {
         VStack(spacing: 0) {
             if let inlineVM = inlineResponseViewModel {
-                InlineResponseView(viewModel: inlineVM, popupViewModel: viewModel, closeAction: closeAction)
+                InlineResponseView(viewModel: inlineVM, closeAction: closeAction)
                 .frame(maxHeight: 300)
                 Divider().opacity(0.5)
             }
@@ -243,7 +245,7 @@ struct ToolbarView: View {
                     .disabled(isProcessing)
                     .help("Replace selected text with the latest response")
                 } else {
-                    Menu {
+                    Menu(content: {
                         ForEach(sortedCommands) { command in
                             Button {
                                 updateSelection(to: command)
@@ -254,7 +256,7 @@ struct ToolbarView: View {
                                 }
                             }
                         }
-                    } label: {
+                    }, label: {
                         if settings.commandDisplayStyle == .iconOnly {
                             ZStack {
                                 Circle()
@@ -304,7 +306,7 @@ struct ToolbarView: View {
                                     }
                             )
                         }
-                    }
+                    })
                     .buttonStyle(.plain)
                     .padding(.leading, 4)
                     .padding(.trailing, 2)
@@ -365,11 +367,11 @@ struct ToolbarView: View {
                     }
                     .frame(width: DesignSystem.buttonSize, height: DesignSystem.buttonSize)
                 }
+                .buttonStyle(.plain)
+                .disabled(selectedCommand == nil && !isProcessing)
+                .padding(.leading, 2)
+                .padding(.trailing, 8)         
             }
-            .buttonStyle(.plain)
-            .disabled(selectedCommand == nil && !isProcessing)
-            .padding(.leading, 2)
-            .padding(.trailing, 8)         
             .frame(height: DesignSystem.pillHeight)
         }
         .windowBackground(shape: inlineResponseViewModel != nil ?
@@ -386,7 +388,12 @@ struct ToolbarView: View {
             }
         )
         .onChange(of: inlineResponseViewModel != nil) { _, active in
-            viewModel.inlineResponseActive = active
+            settings.isInlineResponseActive = active
+        }
+        .alert("Error", isPresented: $showingErrorAlert) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text(errorMessage)
         }
     }
 
@@ -439,6 +446,8 @@ struct ToolbarView: View {
                     appState.replaceSelectedText(with: text)
                 } catch {
                     print("Custom action failed: \(error)")
+                    errorMessage = error.localizedDescription
+                    showingErrorAlert = true
                 }
             }
         }
@@ -519,6 +528,8 @@ struct ToolbarView: View {
                 // Ignore cancellation - user clicked stop
             } catch {
                 print("Execution failed: \(error)")
+                errorMessage = error.localizedDescription
+                showingErrorAlert = true
             }
         }
     }
