@@ -49,51 +49,6 @@ struct GeneralSettingsPane<SaveButton: View>: View {
                         .frame(maxWidth: 300, alignment: .leading)
                 }
 
-                // Response Window Behavior
-                // Floating Window Preferences
-                GridRow(alignment: .top) {
-                    VStack(alignment: .trailing, spacing: 2) {
-                        Text("Open in Window:")
-                            .foregroundStyle(.secondary)
-                        Text("Response Style")
-                            .font(.caption2)
-                            .foregroundStyle(.tertiary)
-                    }
-                    .gridColumnAlignment(.trailing)
-                    .frame(width: 110, alignment: .trailing)
-                    .padding(.top, 2)
-                    
-                    VStack(alignment: .leading, spacing: 10) {
-                        Toggle("Built-in Commands", isOn: $settings.openBuiltInCommandsInResponseView)
-                            .toggleStyle(.checkbox)
-
-                        Toggle("My Custom Commands", isOn: $settings.openCustomCommandsInResponseView)
-                            .toggleStyle(.checkbox)
-                        
-                        Toggle("Manual Input (Ask Critique)", isOn: $settings.openManualInstructionsInResponseView)
-                            .toggleStyle(.checkbox)
-                        
-                        Text("Opens the AI's response in a new window instead of replacing your selected text directly.")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                            .frame(maxWidth: 320, alignment: .leading)
-                            .padding(.top, 4)
-                    }
-                }
-
-                GridRow(alignment: .top) {
-                    Text("Interactions:")
-                        .gridColumnAlignment(.trailing)
-                        .frame(width: 110, alignment: .trailing)
-                        .foregroundStyle(.secondary)
-                        .padding(.top, 2)
-                    
-                    VStack(alignment: .leading, spacing: 10) {
-                        Toggle("Enter to Accept Response", isOn: $settings.enterToAcceptInlineResponse)
-                            .toggleStyle(.checkbox)
-                    }
-                }
-
                 // Restart Onboarding
                 GridRow(alignment: .top) {
                     Text("Onboarding:")
