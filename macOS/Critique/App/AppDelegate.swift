@@ -240,7 +240,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
                 self.appState.capturedSelectionAttributes = nil
             }
 
-            
+            self.appState.toolbarViewModel.reset()
             let window = PopupWindow(appState: self.appState)
             NSApp.activate()
             window.makeKeyAndOrderFront(nil)

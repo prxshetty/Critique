@@ -55,6 +55,7 @@ final class AppState {
     // Command management
     var commandManager = CommandManager()
     var customCommandsManager = CustomCommandsManager()
+    var toolbarViewModel = ToolbarViewModel()
 
     // Current provider with UI binding support
     private(set) var currentProvider: String
