@@ -5,12 +5,9 @@ import AppKit
 
 struct ToolbarView: View {
     @Bindable var appState: AppState
-    @State private var customText: String = ""
-    @State private var isProcessing: Bool = false
-    @State private var selectedCommandID: UUID? = nil
-    @State private var executionTask: Task<Void, Never>? = nil
-    @State private var inlineResponseViewModel: ResponseViewModel? = nil
-
+    
+    private var model: ToolbarViewModel { appState.toolbarViewModel }
+    
     @Bindable private var settings = AppSettings.shared
     @Environment(\.colorScheme) private var colorScheme
 
@@ -21,7 +18,7 @@ struct ToolbarView: View {
     }
 
     private var selectedCommand: CommandModel? {
-        if let localId = selectedCommandID, let local = appState.commandManager.commands.first(where: { $0.id == localId }) {
+        if let localId = model.selectedCommandID, let local = appState.commandManager.commands.first(where: { $0.id == localId }) {
             return local
         }
         if let customId = settings.primaryCommandID {
@@ -125,21 +122,37 @@ struct ToolbarView: View {
             : NSColor.labelColor
     }
 
+    @ViewBuilder
+    private var borderOverlay: some View {
+        if model.inlineResponseViewModel != nil {
+            RoundedRectangle(cornerRadius: 16)
+                .strokeBorder(themeTokens.borderColor(colorScheme), lineWidth: 1.0)
+        } else {
+            Capsule()
+                .strokeBorder(themeTokens.borderColor(colorScheme), lineWidth: 1.0)
+        }
+    }
+
     // Error handling
     @State private var showingErrorAlert = false
     @State private var errorMessage = ""
 
     var body: some View {
+        let isProcessing = model.isToolbarProcessing || (model.inlineResponseViewModel?.isProcessing ?? false)
+        
         VStack(spacing: 0) {
-            if let inlineVM = inlineResponseViewModel {
+            if let inlineVM = model.inlineResponseViewModel {
                 InlineResponseView(viewModel: inlineVM, closeAction: closeAction)
-                .frame(maxHeight: 300)
-                Divider().opacity(0.5)
+                    .frame(minHeight: 60, maxHeight: 300)
+                    .id(ObjectIdentifier(inlineVM))
+                Divider()
+                    .opacity(0.3)
+                    .padding(.horizontal, 12)
             }
             HStack(spacing: 0) {
                 // ── Text input ──────────────────────────────────────────────
                 ZStack(alignment: .leading) {
-                    if customText.isEmpty {
+                    if model.customText.isEmpty {
                         Text(isProcessing ? "Critiquing..." : "Ask Critique...")
                             .foregroundStyle(isProcessing ? loadingPlaceholderColor : secondaryColor)
                             .padding(.leading, 14)
@@ -155,25 +168,25 @@ struct ToolbarView: View {
                     }
 
                     ToolbarInputField(
-                        text: $customText,
+                        text: $appState.toolbarViewModel.customText,
                         textColor: NSColor(primaryColor),
                         cursorColor: textCursorColor,
                         isEditable: !isProcessing,
                         onSubmit: {
-                            if let inlineVM = inlineResponseViewModel {
-                                let prompt = customText.trimmingCharacters(in: .whitespacesAndNewlines)
+                            if let inlineVM = model.inlineResponseViewModel {
+                                let prompt = model.customText.trimmingCharacters(in: .whitespacesAndNewlines)
                                 if prompt.isEmpty {
                                     // If empty, check if we should "Accept" the response via Enter
                                     if settings.enterToAcceptInlineResponse {
                                         replaceContent(using: inlineVM)
                                     }
                                 } else {
-                                    customText = ""
-                                    isProcessing = true
+                                    model.customText = ""
+                                    model.isToolbarProcessing = true
                                     inlineVM.startFollowUpQuestion(
                                         prompt,
-                                        onCompletion: { isProcessing = false },
-                                        onFailure: { _ in isProcessing = false }
+                                        onCompletion: { model.isToolbarProcessing = false },
+                                        onFailure: { _ in model.isToolbarProcessing = false }
                                     )
                                 }
                             } else {
@@ -189,7 +202,7 @@ struct ToolbarView: View {
                 .frame(minWidth: 100)
 
                 // ── Tone picker or Replace button ───────────────────────────────────────────
-                if let inlineVM = inlineResponseViewModel {
+                if let inlineVM = model.inlineResponseViewModel {
                     Button {
                         replaceContent(using: inlineVM)
                     } label: {
@@ -315,17 +328,17 @@ struct ToolbarView: View {
                 Button {
                     if isProcessing {
                         stopProcessing()
-                    } else if let inlineVM = inlineResponseViewModel, !customText.isEmpty {
-                        let prompt = customText
-                        customText = ""
-                        isProcessing = true
+                    } else if let inlineVM = model.inlineResponseViewModel, !model.customText.isEmpty {
+                        let prompt = model.customText
+                        model.customText = ""
+                        model.isToolbarProcessing = true
                         inlineVM.startFollowUpQuestion(
                             prompt,
-                            onCompletion: { isProcessing = false },
-                            onFailure: { _ in isProcessing = false }
+                            onCompletion: { model.isToolbarProcessing = false },
+                            onFailure: { _ in model.isToolbarProcessing = false }
                         )
                     }
-                    else if !customText.isEmpty {
+                    else if !model.customText.isEmpty {
                         runCustomAction()
                     } else if let command = selectedCommand {
                         execute(command)
@@ -374,20 +387,12 @@ struct ToolbarView: View {
             }
             .frame(height: DesignSystem.pillHeight)
         }
-        .windowBackground(shape: inlineResponseViewModel != nil ?
+        .windowBackground(shape: model.inlineResponseViewModel != nil ?
         AnyShape(RoundedRectangle(cornerRadius: 16)) : AnyShape(Capsule()))
-        .overlay(
-            Group {
-                if inlineResponseViewModel != nil {
-                    RoundedRectangle(cornerRadius: 16)
-                    .strokeBorder(themeTokens.borderColor(colorScheme), lineWidth: 1.0)
-                } else {
-                    Capsule()
-                        .strokeBorder(themeTokens.borderColor(colorScheme), lineWidth: 1.0)
-                }
-            }
-        )
-        .onChange(of: inlineResponseViewModel != nil) { _, active in
+        .clipShape(model.inlineResponseViewModel != nil ?
+        AnyShape(RoundedRectangle(cornerRadius: 16)) : AnyShape(Capsule()))
+        .overlay(borderOverlay, alignment: .center)
+        .onChange(of: model.inlineResponseViewModel != nil) { _, active in
             settings.isInlineResponseActive = active
         }
         .alert("Error", isPresented: $showingErrorAlert) {
@@ -400,19 +405,19 @@ struct ToolbarView: View {
     // MARK: - Helpers
 
     private func updateSelection(to command: CommandModel) {
-        selectedCommandID = command.id
+        model.selectedCommandID = command.id
     }
 
     private func runCustomAction() {
-        guard !customText.isEmpty else { return }
-        let promptToRun = customText
-        customText = "" // Clear to show "Critiquing..." placeholder
+        guard !model.customText.isEmpty else { return }
+        let promptToRun = model.customText
+        model.customText = "" // Clear to show "Critiquing..." placeholder
 
-        isProcessing = true
-        executionTask = Task { @MainActor in
+        model.isToolbarProcessing = true
+        model.executionTask = Task { @MainActor in
             defer {
-                isProcessing = false
-                executionTask = nil
+                model.isToolbarProcessing = false
+                model.executionTask = nil
             }
 
             let systemPrompt = CommandExecutionEngine.customInstructionSystemPrompt
@@ -424,7 +429,7 @@ struct ToolbarView: View {
 
             if settings.openManualInstructionsInResponseView || settings.useMultiIteration {
                 withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
-                    self.inlineResponseViewModel = ResponseViewModel(
+                    model.inlineResponseViewModel = ResponseViewModel(
                         selectedText: selectedText,
                         option: nil,
                         provider: appState.activeProvider,
@@ -454,12 +459,12 @@ struct ToolbarView: View {
     }
 
     private func stopProcessing() {
-        executionTask?.cancel()
-        executionTask = nil
-        inlineResponseViewModel?.cancelOngoingTasks()
+        model.executionTask?.cancel()
+        model.executionTask = nil
+        model.inlineResponseViewModel?.cancelOngoingTasks()
         appState.activeProvider.cancel()
         appState.isProcessing = false
-        isProcessing = false
+        model.isToolbarProcessing = false
     }
 
     private func replaceContent(using viewModel: ResponseViewModel) {
@@ -480,13 +485,13 @@ struct ToolbarView: View {
 
 
     private func execute(_ command: CommandModel) {
-        executionTask?.cancel()
-        isProcessing = true
+        model.executionTask?.cancel()
+        model.isToolbarProcessing = true
         
-        executionTask = Task { @MainActor in
+        model.executionTask = Task { @MainActor in
             defer {
-                isProcessing = false
-                executionTask = nil
+                model.isToolbarProcessing = false
+                model.executionTask = nil
             }
             
             do {
@@ -500,7 +505,7 @@ struct ToolbarView: View {
 
                 if shouldShowInWindow {
                     withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
-                        self.inlineResponseViewModel = ResponseViewModel(
+                        model.inlineResponseViewModel = ResponseViewModel(
                             selectedText: appState.selectedText,
                             option: nil,
                             provider: provider,
@@ -522,7 +527,7 @@ struct ToolbarView: View {
                     appState.replaceSelectedText(with: text)
                     
                     // Reset selection after direct replacement
-                    self.selectedCommandID = nil
+                    model.selectedCommandID = nil
                 }
             } catch is CancellationError {
                 // Ignore cancellation - user clicked stop

@@ -274,6 +274,10 @@ struct MessageBlock: View {
     let message: ChatMessage
     let fontSize: CGFloat
     var hideCopyButton: Bool = false
+    /// When true, renders assistant text with native SwiftUI Text() instead of the
+    /// WKWebView-backed MarkdownView. Use this for compact/inline contexts to avoid
+    /// the intermittent blank-text bug caused by the WebKit remote process disconnecting.
+    var useSimpleRenderer: Bool = false
     @State private var showCopied: Bool = false
     
     @Bindable private var settings = AppSettings.shared
@@ -298,11 +302,11 @@ struct MessageBlock: View {
             } else {
                 // ── Assistant output ───────────────────────────────────
                 Group {
-                    let assistantTextColor: Color = colorScheme == .dark || settings.themeStyle != .standard ? .white : .primary
+                    let assistantTextColor: Color = settings.themeStyle == .gradient ? .white : .primary
                     
                     if message.isStreaming && message.content.isEmpty {
                         EmptyView()
-                    } else if message.isStreaming {
+                    } else if message.isStreaming || useSimpleRenderer {
                         Text(message.content)
                             .font(.system(size: fontSize))
                             .foregroundStyle(assistantTextColor)

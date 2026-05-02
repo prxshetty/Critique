@@ -6,38 +6,44 @@ struct InlineResponseView: View {
 
     @Environment(\.accessibilityReduceMotion) var reduceMotion
     @Environment(\.colorScheme) var colorScheme
-
-
+    
+    @State private var contentHeight: CGFloat = .zero
 
     var body: some View {
         VStack(spacing: 0) {
             ScrollViewReader { proxy in
-                VStack(spacing: 0) {
-                    ScrollView { 
-                        VStack(alignment: .leading, spacing: 16) {
-                            ForEach(viewModel.messages) { message in
-                                MessageBlock(message: message, fontSize: viewModel.fontSize, hideCopyButton: true)
-                                    .id(message.id)
-                            }
-                            
-                            if viewModel.isProcessing && viewModel.messages.last?.isStreaming == true && viewModel.messages.last?.content.isEmpty == true {
-                                ThinkingIndicator()
-                                    .padding(.top, 4)
-                            }
-
-                            Color.clear.frame(height: 1).id("bottom")
+                ScrollView { 
+                    VStack(alignment: .leading, spacing: 16) {
+                        ForEach(viewModel.messages) { message in
+                            MessageBlock(message: message, fontSize: viewModel.fontSize, hideCopyButton: true, useSimpleRenderer: true)
+                                .id(message.id)
                         }
-                        .padding(.horizontal, 16)
-                        .padding(.vertical, 14)
+                        
+                        if viewModel.isProcessing && viewModel.messages.last?.isStreaming == true && viewModel.messages.last?.content.isEmpty == true {
+                            ThinkingIndicator()
+                                .padding(.top, 4)
+                        }
+
+                        Color.clear.frame(height: 1).id("bottom")
                     }
-                    .background(InjectedScrollHider())
-                    
-                    if !viewModel.isProcessing || AppSettings.shared.useMultiIteration {
-                        bottomToolbar
-                            .padding(.horizontal, 16)
-                            .padding(.vertical, 4)
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 14)
+                    .background(
+                        GeometryReader { geo in
+                            Color.clear.preference(key: InlineContentHeightKey.self, value: geo.size.height)
+                        }
+                    )
+                }
+                .frame(height: contentHeight > 0 ? min(contentHeight, 300) : nil)
+                .onPreferenceChange(InlineContentHeightKey.self) { height in
+                    if height != self.contentHeight {
+                        self.contentHeight = height
+                        let scrollHeight = min(height, 300)
+                        let headerHeight: CGFloat = AppSettings.shared.useMultiIteration ? 22 : 0
+                        AppState.shared.toolbarViewModel.inlineResponseHeight = scrollHeight + headerHeight
                     }
                 }
+                .background(InjectedScrollHider())
                 .onChange(of: viewModel.messages) { old, new in
                     guard new.count > old.count else { return }
                     scrollToBottom(proxy: proxy)
@@ -46,44 +52,43 @@ struct InlineResponseView: View {
                     guard viewModel.messages.last?.isStreaming == true else { return }
                     scrollToBottom(proxy: proxy)
                 }
+                // Safety net: if Apple Intelligence resolved before SwiftUI finished
+                // mounting this view (the fast-provider race), scroll to show content.
+                .onAppear {
+                    DispatchQueue.main.async {
+                        scrollToBottom(proxy: proxy)
+                    }
+                }
+            }
+            
+            if AppSettings.shared.useMultiIteration {
+                iterationHeader
+                    .padding(.top, 4)
+                    .padding(.bottom, 12)
             }
         }
     }
 
-    private var iterationIndicator: some View {
-        HStack(spacing: 4) {
-            ForEach(0..<3, id: \.self) { index in
-                let isSelected = index == viewModel.selectedIterationIndex
-                let isGenerated = index < viewModel.iterations.count
-                Circle()
-                    .fill(isSelected ? Color.blue : (isGenerated ? Color.secondary : Color.secondary.opacity(0.3)))
-                    .frame(width: 6, height: 6)
-            }
-        }
-    }
-
-    private var bottomToolbar: some View {
+    private var iterationHeader: some View {
         HStack {
             Spacer()
-            if AppSettings.shared.useMultiIteration {
-                HStack(spacing: 8) {
-                    ForEach(0..<3, id: \.self) { index in
-                        let isSelected = index == viewModel.selectedIterationIndex
-                        let isGenerated = index < viewModel.iterations.count
-                        
-                        Circle()
-                            .fill(isSelected ? Color.blue : Color.secondary.opacity(isGenerated ? 1.0 : 0.3))
-                            .frame(width: 7, height: 7)
-                            .shimmer(isActive: !isGenerated && viewModel.isProcessing)
-                            .onTapGesture {
-                                if isGenerated {
-                                    withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
-                                        viewModel.selectedIterationIndex = index
-                                        updateMessageFromIteration()
-                                    }
+            HStack(spacing: 8) {
+                ForEach(0..<3, id: \.self) { index in
+                    let isSelected = index == viewModel.selectedIterationIndex
+                    let isGenerated = index < viewModel.iterations.count
+                    
+                    Circle()
+                        .fill(isSelected ? Color.blue : Color.secondary.opacity(isGenerated ? 1.0 : 0.3))
+                        .frame(width: 6, height: 6)
+                        .shimmer(isActive: !isGenerated && viewModel.isProcessing)
+                        .onTapGesture {
+                            if isGenerated {
+                                withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                                    viewModel.selectedIterationIndex = index
+                                    updateMessageFromIteration()
                                 }
                             }
-                    }
+                        }
                 }
             }
             Spacer()
@@ -138,5 +143,13 @@ struct InjectedScrollHider: NSViewRepresentable {
                 current = v.superview
             }
         }
+    }
+}
+
+private struct InlineContentHeightKey: PreferenceKey {
+    static var defaultValue: CGFloat = .zero
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+        let next = nextValue()
+        value = next > value ? next : value
     }
 }
