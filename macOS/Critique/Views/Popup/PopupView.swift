@@ -10,6 +10,7 @@ final class PopupViewModel {
   var isEditMode: Bool = false
   var showingClassicGrid: Bool = false
   var inlineResponseActive: Bool = false
+  var isResponseExpanded: Bool = false
 }
 
 struct PopupView: View {
@@ -126,7 +127,48 @@ struct PopupView: View {
         .buttonStyle(.plain)
         .help(viewModel.isEditMode ? "Exit Edit Mode" : (viewModel.showingClassicGrid ? "Back" : "Close"))
         
-        Spacer()
+        if !viewModel.isEditMode {
+            // Pill-shaped input field
+            HStack(spacing: 4) {
+                ZStack(alignment: .leading) {
+                    if customText.isEmpty {
+                        Text(isCustomLoading ? "Critiquing..." : "Ask Critique...")
+                            .foregroundStyle(isCustomLoading ? Color.secondary.opacity(0.5) : Color.secondary)
+                            .padding(.leading, 12)
+                            .font(.system(size: 13))
+                    }
+                    ToolbarInputField(
+                        text: $customText,
+                        textColor: NSColor.labelColor,
+                        cursorColor: NSColor.labelColor,
+                        isEditable: !isCustomLoading,
+                        onSubmit: { runCustomAction() }
+                    )
+                    .padding(.vertical, 4)
+                    .padding(.leading, 12)
+                }
+                
+                if !customText.isEmpty {
+                    Button(action: runCustomAction) {
+                        Image(systemName: isCustomLoading ? "ellipsis" : "arrow.up.circle.fill")
+                            .font(.system(size: 16))
+                            .foregroundStyle(isCustomLoading ? Color.secondary.opacity(0.3) : Color.accentColor)
+                    }
+                    .buttonStyle(.plain)
+                    .disabled(isCustomLoading)
+                    .padding(.trailing, 8)
+                }
+            }
+            .frame(height: 28)
+            .background(Color(.controlBackgroundColor))
+            .clipShape(Capsule())
+            .overlay(
+                Capsule()
+                    .strokeBorder(Color.secondary.opacity(0.1), lineWidth: 1)
+            )
+        } else {
+            Spacer()
+        }
 
         Button(action: {
           viewModel.isEditMode.toggle()
@@ -164,6 +206,7 @@ struct PopupView: View {
         .buttonStyle(.plain)
         .padding(.horizontal, 16)
       }
+
     }
     .padding(.bottom, 8)
     .windowBackground(shape: RoundedRectangle(cornerRadius: 20))
@@ -207,6 +250,29 @@ struct PopupView: View {
       }
     } else {
       grid
+    }
+  }
+
+  private func runCustomAction() {
+    guard !customText.isEmpty else { return }
+    let prompt = customText
+    customText = ""
+    isCustomLoading = true
+    
+    customInstructionTask = Task { @MainActor in
+      defer { isCustomLoading = false }
+      
+      do {
+        _ = try await CommandExecutionEngine.shared.executeCustomInstruction(
+          prompt,
+          source: .popup,
+          openInResponseWindow: settings.openManualInstructionsInResponseView || settings.useMultiIteration,
+          closePopupOnInlineCompletion: closeAction
+        )
+      } catch {
+        errorMessage = error.localizedDescription
+        showingErrorAlert = true
+      }
     }
   }
 
