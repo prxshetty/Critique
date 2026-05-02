@@ -91,7 +91,8 @@ class PopupWindow: NSWindow {
     
     var contentHeight: CGFloat
     if AppSettings.shared.isInlineResponseActive {
-      contentHeight = pillHeight + 301 // Full height for all response views
+      let responseHeight = appState.toolbarViewModel.inlineResponseHeight
+      contentHeight = pillHeight + responseHeight
     } else {
       contentHeight = pillHeight
     }
@@ -316,6 +317,12 @@ struct PopupWindowContentView: View {
       DispatchQueue.main.async { onSizeChange() }
     }
     .onChange(of: AppSettings.shared.isInlineResponseActive) { _, _ in
+      DispatchQueue.main.async { onSizeChange() }
+    }
+    .onChange(of: appState.toolbarViewModel.inlineResponseHeight) { _, _ in
+      DispatchQueue.main.async { onSizeChange() }
+    }
+    .onChange(of: appState.toolbarViewModel.inlineResponseViewModel != nil) { _, _ in
       DispatchQueue.main.async { onSizeChange() }
     }
   }
