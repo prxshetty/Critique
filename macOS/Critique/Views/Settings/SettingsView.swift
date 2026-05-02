@@ -30,6 +30,7 @@ struct SettingsView: View {
         case appearance  = "Appearance"
         case commands    = "Commands"
         case privacy     = "Privacy"
+        case response    = "Response"
         case aiProvider  = "AI Provider"
         
         var id: Self { self }
@@ -44,6 +45,8 @@ struct SettingsView: View {
                 return "command"
             case .privacy:
                 return "lock.shield"
+            case .response:
+                return "text.bubble"
             case .aiProvider:
                 return "network"
             }
@@ -117,6 +120,9 @@ struct SettingsView: View {
                             showOnlyApiSetup: showOnlyApiSetup,
                             saveButton: EmptyView()
                         )
+                    case .response:
+                        ResponseSettingsPane()
+                        
                     case .aiProvider:
                         AIProviderSettingsPane(
                             appState: appState,
