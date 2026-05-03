@@ -52,7 +52,7 @@ struct WindowBackground: ViewModifier {
                     case .gradient:
                         MeshLikeGradientBackground()
                     case .glass:
-                        GlassmorphicBackground()
+                        GlassmorphicBackground(stroke: shape)
                     case .oled:
                         colorScheme == .dark ? Color.black : Color.white
                     }
@@ -89,13 +89,14 @@ struct MeshLikeGradientBackground: View {
 struct GlassmorphicBackground: View {
     @Environment(\.colorScheme) var colorScheme
     @Environment(\.accessibilityReduceTransparency) var reduceTransparency
+    var stroke: AnyShape = AnyShape(Rectangle())
 
     var body: some View {
         ZStack {
             if reduceTransparency {
                 colorScheme == .light ? Color(.windowBackgroundColor) : Color.black
             } else {
-                CustomGlassBackground(colorScheme: colorScheme)
+                CustomGlassBackground(colorScheme: colorScheme, stroke: stroke)
             }
         }
     }
@@ -105,6 +106,7 @@ struct GlassmorphicBackground: View {
 /// stays visually stable instead of depending on the system Liquid Glass.
 struct CustomGlassBackground: View {
     let colorScheme: ColorScheme
+    var stroke: AnyShape = AnyShape(Rectangle())
 
     var body: some View {
         ZStack {
@@ -125,13 +127,15 @@ struct CustomGlassBackground: View {
                         : Color.black.opacity(0.18)
                 )
 
-            Rectangle()
-                .strokeBorder(
+            // Use stroke + mask to simulate strokeBorder on AnyShape
+            stroke
+                .stroke(
                     colorScheme == .light
                         ? Color.black.opacity(0.14)
                         : Color.white.opacity(0.18),
-                    lineWidth: 1.0
+                    lineWidth: 2.0 // Double width because half is masked out
                 )
+                .mask(stroke)
         }
     }
 }

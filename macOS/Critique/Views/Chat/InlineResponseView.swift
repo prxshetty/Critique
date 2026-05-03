@@ -6,6 +6,11 @@ struct InlineResponseView: View {
 
     @Environment(\.accessibilityReduceMotion) var reduceMotion
     @Environment(\.colorScheme) var colorScheme
+    @Bindable private var settings = AppSettings.shared
+    
+    private var themeTokens: DesignSystem.ThemeTokens {
+        DesignSystem.tokens(for: settings.themeStyle)
+    }
     
     @State private var contentHeight: CGFloat = .zero
 
@@ -27,7 +32,8 @@ struct InlineResponseView: View {
                         Color.clear.frame(height: 1).id("bottom")
                     }
                     .padding(.horizontal, 16)
-                    .padding(.vertical, 14)
+                    .padding(.top, 25)
+                    .padding(.bottom, 14)
                     .background(
                         GeometryReader { geo in
                             Color.clear.preference(key: InlineContentHeightKey.self, value: geo.size.height)
@@ -35,6 +41,7 @@ struct InlineResponseView: View {
                     )
                 }
                 .frame(height: contentHeight > 0 ? min(contentHeight, 300) : nil)
+                .animation(.easeInOut(duration: 0.25), value: contentHeight)
                 .onPreferenceChange(InlineContentHeightKey.self) { height in
                     if height != self.contentHeight {
                         self.contentHeight = height
@@ -49,14 +56,20 @@ struct InlineResponseView: View {
                     scrollToBottom(proxy: proxy)
                 }
                 .onChange(of: viewModel.messages.last?.content) { _, _ in 
-                    guard viewModel.messages.last?.isStreaming == true else { return }
-                    scrollToBottom(proxy: proxy)
+                    // For the initial response, we want to show the top so the user can read from the start.
+                    // For follow-up chats or active streaming, we scroll to show progress.
+                    if viewModel.messages.count > 1 || viewModel.messages.last?.isStreaming == true {
+                        scrollToBottom(proxy: proxy)
+                    }
                 }
                 // Safety net: if Apple Intelligence resolved before SwiftUI finished
                 // mounting this view (the fast-provider race), scroll to show content.
                 .onAppear {
                     DispatchQueue.main.async {
-                        scrollToBottom(proxy: proxy)
+                        // Only auto-scroll to bottom on appear if we're already in a follow-up conversation
+                        if viewModel.messages.count > 1 {
+                            scrollToBottom(proxy: proxy)
+                        }
                     }
                 }
             }
@@ -67,6 +80,11 @@ struct InlineResponseView: View {
                     .padding(.bottom, 12)
             }
         }
+        .windowBackground(shape: AnyShape(RoundedRectangle(cornerRadius: 16)))
+        .overlay(
+            RoundedRectangle(cornerRadius: 16)
+                .strokeBorder(themeTokens.borderColor(colorScheme), lineWidth: 1.0)
+        )
     }
 
     private var iterationHeader: some View {
