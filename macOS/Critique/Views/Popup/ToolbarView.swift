@@ -124,13 +124,8 @@ struct ToolbarView: View {
 
     @ViewBuilder
     private var borderOverlay: some View {
-        if model.inlineResponseViewModel != nil {
-            RoundedRectangle(cornerRadius: 16)
-                .strokeBorder(themeTokens.borderColor(colorScheme), lineWidth: 1.0)
-        } else {
-            Capsule()
-                .strokeBorder(themeTokens.borderColor(colorScheme), lineWidth: 1.0)
-        }
+        Capsule()
+            .strokeBorder(themeTokens.borderColor(colorScheme), lineWidth: 1.0)
     }
 
     // Error handling
@@ -139,17 +134,9 @@ struct ToolbarView: View {
 
     var body: some View {
         let isProcessing = model.isToolbarProcessing || (model.inlineResponseViewModel?.isProcessing ?? false)
+        let showInlineResponse = model.inlineResponseViewModel?.hasContentToDisplay == true
         
-        VStack(spacing: 0) {
-            if let inlineVM = model.inlineResponseViewModel {
-                InlineResponseView(viewModel: inlineVM, closeAction: closeAction)
-                    .frame(minHeight: 60, maxHeight: 300)
-                    .id(ObjectIdentifier(inlineVM))
-                Divider()
-                    .opacity(0.3)
-                    .padding(.horizontal, 12)
-            }
-            HStack(spacing: 0) {
+        HStack(spacing: 0) {
                 // ── Text input ──────────────────────────────────────────────
                 ZStack(alignment: .leading) {
                     if model.customText.isEmpty {
@@ -202,7 +189,7 @@ struct ToolbarView: View {
                 .frame(minWidth: 100)
 
                 // ── Tone picker or Replace button ───────────────────────────────────────────
-                if let inlineVM = model.inlineResponseViewModel {
+                if let inlineVM = model.inlineResponseViewModel, showInlineResponse {
                     Button {
                         replaceContent(using: inlineVM)
                     } label: {
@@ -383,24 +370,21 @@ struct ToolbarView: View {
                 .buttonStyle(.plain)
                 .disabled(selectedCommand == nil && !isProcessing)
                 .padding(.leading, 2)
-                .padding(.trailing, 8)         
+                .padding(.trailing, 8)
             }
             .frame(height: DesignSystem.pillHeight)
+            .windowBackground(shape: AnyShape(Capsule()))
+            .clipShape(AnyShape(Capsule()))
+            .overlay(borderOverlay, alignment: .center)
+            .onChange(of: showInlineResponse) { _, active in
+                settings.isInlineResponseActive = active
+            }
+            .alert("Error", isPresented: $showingErrorAlert) {
+                Button("OK", role: .cancel) {}
+            } message: {
+                Text(errorMessage)
+            }
         }
-        .windowBackground(shape: model.inlineResponseViewModel != nil ?
-        AnyShape(RoundedRectangle(cornerRadius: 16)) : AnyShape(Capsule()))
-        .clipShape(model.inlineResponseViewModel != nil ?
-        AnyShape(RoundedRectangle(cornerRadius: 16)) : AnyShape(Capsule()))
-        .overlay(borderOverlay, alignment: .center)
-        .onChange(of: model.inlineResponseViewModel != nil) { _, active in
-            settings.isInlineResponseActive = active
-        }
-        .alert("Error", isPresented: $showingErrorAlert) {
-            Button("OK", role: .cancel) {}
-        } message: {
-            Text(errorMessage)
-        }
-    }
 
     // MARK: - Helpers
 
@@ -486,6 +470,10 @@ struct ToolbarView: View {
 
     private func execute(_ command: CommandModel) {
         model.executionTask?.cancel()
+        
+        // Clear custom text so the "Critiquing..." placeholder can be displayed
+        model.customText = ""
+        
         model.isToolbarProcessing = true
         
         model.executionTask = Task { @MainActor in
@@ -502,6 +490,9 @@ struct ToolbarView: View {
                 let shouldShowInWindow = command.useResponseWindow || 
                                        (command.isBuiltIn ? settings.openBuiltInCommandsInResponseView : settings.openCustomCommandsInResponseView) ||
                                        settings.useMultiIteration
+
+                // Allow the shimmer animation to initialize in the UI before triggering a major layout expansion
+                try? await Task.sleep(for: .milliseconds(150))
 
                 if shouldShowInWindow {
                     withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
@@ -610,8 +601,11 @@ struct ShimmerOverlay: View {
         }
         .onAppear {
             travel = -1.2
-            withAnimation(.linear(duration: duration).repeatForever(autoreverses: false)) {
-                travel = 1.4
+            // Dispatch async to prevent the animation from being swallowed by parent spring transactions
+            DispatchQueue.main.async {
+                withAnimation(.linear(duration: duration).repeatForever(autoreverses: false)) {
+                    travel = 1.4
+                }
             }
         }
     }

@@ -34,7 +34,9 @@ class PopupWindow: NSWindow {
     hasShadow = false
 
     let closeAction: () -> Void = { [weak self] in
-      self?.close()
+      // Use WindowManager to dismiss so both the toolbar and the
+      // InlineResponseWindow are closed together.
+      WindowManager.shared.dismissPopup()
       if let bundleId = self?.appState.previousApplication?.bundleIdentifier {
         NSApp.yieldActivation(toApplicationWithBundleIdentifier: bundleId)
       }
@@ -89,13 +91,7 @@ class PopupWindow: NSWindow {
 
     let pillHeight = DesignSystem.pillHeight
     
-    var contentHeight: CGFloat
-    if AppSettings.shared.isInlineResponseActive {
-      let responseHeight = appState.toolbarViewModel.inlineResponseHeight
-      contentHeight = pillHeight + responseHeight
-    } else {
-      contentHeight = pillHeight
-    }
+    let contentHeight = pillHeight
 
     guard contentView != nil else { return }
 
@@ -320,10 +316,17 @@ struct PopupWindowContentView: View {
       DispatchQueue.main.async { onSizeChange() }
     }
     .onChange(of: appState.toolbarViewModel.inlineResponseHeight) { _, _ in
-      DispatchQueue.main.async { onSizeChange() }
+      WindowManager.shared.syncResponsePanel()
+    }
+    .onChange(of: appState.toolbarViewModel.inlineResponseViewModel?.hasContentToDisplay) { _, newValue in
+      // This fires the moment the first AI response arrives — the critical trigger
+      // to create and position the InlineResponseWindow for the first time.
+      if newValue == true {
+        WindowManager.shared.syncResponsePanel()
+      }
     }
     .onChange(of: appState.toolbarViewModel.inlineResponseViewModel != nil) { _, _ in
-      DispatchQueue.main.async { onSizeChange() }
+      WindowManager.shared.syncResponsePanel()
     }
   }
 }

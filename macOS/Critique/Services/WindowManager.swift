@@ -12,7 +12,7 @@ class WindowManager: NSObject, NSWindowDelegate {
 
     // Track a single PopupWindow
     private weak var popupWindow: PopupWindow?
-
+    private var responsePanel: InlineResponseWindow?
     enum PopupDismissSuppressionReason: Hashable {
         case commandEditorSheet
         case commandsManagerSheet
@@ -64,6 +64,36 @@ class WindowManager: NSObject, NSWindowDelegate {
         window.delegate = self
     }
 
+    func syncResponsePanel() {
+        guard let popup = popupWindow,
+        let viewModel = AppState.shared.toolbarViewModel.inlineResponseViewModel,
+        viewModel.hasContentToDisplay else {
+            responsePanel?.close()
+            responsePanel = nil
+            return
+        }
+
+        if responsePanel == nil {
+            responsePanel = InlineResponseWindow()
+            let view = InlineResponseView(viewModel: viewModel, closeAction: { [weak self] in self?.dismissPopup() })
+            let hostingView = InlineResponseHostingView(rootView: view)
+            // Clear the default opaque NSHostingView background to prevent the black border
+            hostingView.wantsLayer = true
+            hostingView.layer?.backgroundColor = .clear
+            hostingView.layer?.cornerRadius = 16
+            hostingView.layer?.maskedCorners = [
+                .layerMinXMinYCorner, .layerMaxXMinYCorner,
+                .layerMinXMaxYCorner, .layerMaxXMaxYCorner
+            ]
+            hostingView.layer?.masksToBounds = true
+            responsePanel?.contentView = hostingView
+            responsePanel?.orderFront(nil)
+        }
+    
+        let height = AppState.shared.toolbarViewModel.inlineResponseHeight
+        responsePanel?.updatePosition(relativeTo: popup.frame, contentHeight: height)
+    }
+
     func setPopupDismissSuppressed(
         _ isSuppressed: Bool,
         reason: PopupDismissSuppressionReason
@@ -82,6 +112,10 @@ class WindowManager: NSObject, NSWindowDelegate {
 
     func dismissPopup(clearImages: Bool = true) {
         clearPopupDismissSuppressionState()
+
+        responsePanel?.close()
+        responsePanel = nil
+        
         if let window = self.popupWindow {
             window.close()
             self.popupWindow = nil
